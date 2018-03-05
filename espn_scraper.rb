@@ -9,7 +9,7 @@ require 'mysql2'
 puts ESPN.responding?
 #puts ESPN.get_teams_in('ncf')
 #ESPN.get_ncf_scores(2017, 11)
-#puts ESPN.get_pac12_games(2017, 12)
+puts ESPN.get_pac12_games(2017, 12)
 #dbh = DBI.connect("DBI:Mysql:localhost:id3779293_ncaafstats", "id3779293_jcl", "jeffcauchylonny")
 
 #client = Mysql2::Client.new(:host => "localhost", :username => "root")
