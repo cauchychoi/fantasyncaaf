@@ -113,7 +113,8 @@ module ESPN
 	def get_pac12_games(year, week)
 	  markup = Scores.markup_from_year_week_conf('college-football', year, week, 9)
 	  gameIDs = Scores.get_gameIDs(markup)
-	  Scores.get_stats(gameIDs, week)
+	  pac12Weekly = Scores.get_stats(gameIDs, week)
+	  pac12Weekly
 	end
 	
     def get_ncb_scores(date, conference_id)
@@ -363,7 +364,7 @@ module ESPN
 		end
 		#REAL CODE
 		#}
-		puts stats
+		stats
 	  end
 	  
       def winner_loser_parse(doc, date)
