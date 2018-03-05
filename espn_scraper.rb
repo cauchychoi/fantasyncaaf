@@ -20,9 +20,9 @@ puts ESPN.get_pac12_games(2017, 12)
 #DB_PASSWORD = 10f5241c
 
 client = Mysql2::Client.new(:host => "us-cdbr-iron-east-05.cleardb.net", :username => "b4078336a46f7e", :password => "10f5241c", :database => "heroku_28ca4c386152c4f")
-#result = client.query("select * from teamRoster")
-#result.each do |row|
-#	puts row.class
-#end
-#row = dbh.select_one("SELECT VERSION()")
-#puts "Server version: " + row[0]
+result = client.query("select * from teamRoster")
+result.each do |row|
+	puts row.class
+end
+row = dbh.select_one("SELECT VERSION()")
+puts "Server version: " + row[0]
