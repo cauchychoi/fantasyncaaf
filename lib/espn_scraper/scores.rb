@@ -297,6 +297,27 @@ module ESPN
 		#ESPN.get 'scores', league, "scoreboard/_/group/#{group}/year/#{year}/seasontype/2/week/#{week}"
 		stats = []
 		
+		# Variables for defense
+		teamCount = 0
+		teamNames = []
+		finalScores = []
+		finalScoreCount = 0
+		defense = []
+		team0Sacks = 0
+		team1Sacks = 0
+		team0DefensiveTDs = 0
+		team1DefensiveTDs = 0
+		team0Ints = 0
+		team1Ints = 0
+		team0IntYards = 0
+		team1IntYards = 0
+		team0KickRet = 0
+		team1KickRet = 0
+		team0PuntRet = 0
+		team1PuntRet = 0
+		team0FumRec = 0
+		team1FumRec = 0
+		
 		#REAL CODE
 		#pages.each { |page|
 		#html = ESPN.get 'scores', 'college-football', "boxscore?gameId=#{page}"
@@ -314,9 +335,29 @@ module ESPN
 		    end
 		  
 			player.children.each do |playerStat|
+			
+			   #Defense team name and final score
+			   if playerStat['class'] == "team-name"
+				teamNames[teamCount] = playerStat.content
+				teamCount += 1
+			   elsif playerStat['class'] == "final-score"
+				finalScores[finalScoreCount] = playerStat.content
+				finalScoreCount += 1
+			   
+			   
 			   #Offense
-			   if playerStat['class'] == "name"
+			   elsif playerStat['class'] == "name"
 			      stat[:playerName] = playerStat.content
+				  playerLink = playerStat.child['href']
+				  if playerLink =~ /id\/([^\/]+)\//
+					stat[:playerID] = $~[1]
+				  end
+				  playerStat.child.children.each do |findAbbr|
+					  if findAbbr['class'] == "abbr"
+						stat[:playerAbbr] = findAbbr.content
+						stat[:playerName].slice! findAbbr.content
+					  end
+				  end
 				  stat[:week] = week
 			   elsif playerStat['class'] == "c-att"
 				  #stat[:comp_att] = playerStat.content
@@ -334,7 +375,7 @@ module ESPN
 			      stat[:rushingTDs] = playerStat.content
 			   elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split[1] == "Receiving"
 			      stat[:receivingTDs] = playerStat.content
-			   elsif playerStat['class'] == "int"
+			   elsif playerStat['class'] == "int" && player.parent.parent.parent.child.child.content.split[1] == "Passing"
 				  stat[:passingInterceptions] = playerStat.content
 			   elsif playerStat['class'] == "car"
 				  stat[:rushingAttempts] = playerStat.content
@@ -342,11 +383,56 @@ module ESPN
 				  stat[:receptions] = playerStat.content
 			   elsif playerStat['class'] == "lost" && player.parent.parent.parent.child.child.content.split[1] == "Fumbles"
 				  stat[:fumblesLost] = playerStat.content
+				  if (stat[:teamName] == teamNames[0])
+				    team1FumRec += playerStat.content.to_i
+				  else
+				    team0FumRec += playerStat.content.to_i
+				  end
 			   
 			   #Defense
 			   #elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split[1] == "Defense"
-			     
+			   elsif playerStat['class'] == "sacks" && player.parent.parent.parent.child.child.content.split[1] == "Defense"
+				  if (stat[:teamName] == teamNames[0])
+					team0Sacks += playerStat.content.to_i
+				  else
+				    team1Sacks += playerStat.content.to_i
+				  end
+				  
+			   elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split[1] == "Defense"
+				  if (stat[:teamName] == teamNames[0])
+					team0DefensiveTDs += playerStat.content.to_i
+				  else
+				    team1DefensiveTDs += playerStat.content.to_i
+				  end
 			   
+			   elsif playerStat['class'] == "int" && player.parent.parent.parent.child.child.content.split[1] == "Interceptions"
+				  if (stat[:teamName] == teamNames[0])
+					team0Ints += playerStat.content.to_i
+				  else
+				    team1Ints += playerStat.content.to_i
+				  end
+				  
+			   elsif playerStat['class'] == "yds" && player.parent.parent.parent.child.child.content.split[1] == "Interceptions"
+				  if (stat[:teamName] == teamNames[0])
+					team0IntYards += playerStat.content.to_i
+				  else
+				    team1IntYards += playerStat.content.to_i
+				  end				  
+
+			   elsif playerStat['class'] == "yds" && player.parent.parent.parent.child.child.content.split[1] == "Kick"
+				  if (stat[:teamName] == teamNames[0])
+					team0KickRet += playerStat.content.to_i
+				  else
+				    team1KickRet += playerStat.content.to_i
+				  end
+
+			   elsif playerStat['class'] == "yds" && player.parent.parent.parent.child.child.content.split[1] == "Punt"
+				  if (stat[:teamName] == teamNames[0])
+					team0PuntRet += playerStat.content.to_i
+				  else
+				    team1PuntRet += playerStat.content.to_i
+				  end
+				  
 			   #Kicking
 			   elsif playerStat['class'] == "fg"
 			      #stat[:fieldgoals] = playerStat.content
@@ -362,6 +448,17 @@ module ESPN
 			stats << stat
 		  end
 		end
+		
+		team0Defense = {:week => week, :teamName => teamNames[0], :fumblesRecovered => team0FumRec.to_s, :pointsAllowed => finalScores[1], :sacks => team0Sacks.to_s, :TDs => team0DefensiveTDs.to_s, :interceptions => team0Ints.to_s, :interceptionYards => team0IntYards.to_s, :kickReturnYards => team0KickRet.to_s, :puntReturnYards => team0PuntRet.to_s}
+		team1Defense = {:week => week, :teamName => teamNames[1], :fumblesRecovered => team1FumRec.to_s, :pointsAllowed => finalScores[0], :sacks => team1Sacks.to_s, :TDs => team1DefensiveTDs.to_s, :interceptions => team1Ints.to_s, :interceptionYards => team1IntYards.to_s, :kickReturnYards => team1KickRet.to_s, :puntReturnYards => team1PuntRet.to_s}
+
+		stats << team0Defense
+		stats << team1Defense
+		#defense.push(team0Defense)
+		#defense.push(team1Defense)
+		#puts teamNames
+		#puts defense
+		
 		#REAL CODE
 		#}
 		stats
