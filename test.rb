@@ -6,10 +6,11 @@ require 'espn_scraper'
 #require 'dbi'
 require 'mysql2'
 
-puts "TEST!!"
+puts "running"
 
-=begin
+
 puts ESPN.responding?
+=begin
 #puts ESPN.get_teams_in('ncf')
 #ESPN.get_ncf_scores(2017, 11)
 weeklyStats = ESPN.get_pac12_games(2017, 12)
