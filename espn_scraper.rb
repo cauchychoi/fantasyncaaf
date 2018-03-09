@@ -1,6 +1,6 @@
 #!/usr/bin/ruby -w
 
-require './espn_scraper'
+require 'espn_scraper'
 #require 'rubygems'
 #gem 'dbi'
 #require 'dbi'
