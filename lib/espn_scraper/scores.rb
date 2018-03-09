@@ -319,11 +319,11 @@ module ESPN
 		team1FumRec = 0
 		
 		#REAL CODE
-		#pages.each { |page|
-		#html = ESPN.get 'scores', 'college-football', "boxscore?gameId=#{page}"
+		pages.each { |page|
+		html = ESPN.get 'scores', 'college-football', "boxscore?gameId=#{page}"
 		
 		#DEBUG
-		html = ESPN.get 'scores', 'college-football', "boxscore?gameId=#{pages[0]}"
+		#html = ESPN.get 'scores', 'college-football', "boxscore?gameId=#{pages[0]}"
 		#html = ESPN.get 'scores', 'college-football', "boxscore?gameId=400935316"
 		
 		html.xpath("//tbody/tr").each do |player|
@@ -331,7 +331,19 @@ module ESPN
 		  if player['class'] != "highlight"
 		    if player.parent.parent.parent.child.child['class'] == "team-name"
 		    #if player.parent.parent.sibling.child.child['class'] == "table-caption"
-		      stat[:teamName] = player.parent.parent.parent.child.child.content.split[0]
+		      temp = player.parent.parent.parent.child.child.content.split.reverse.drop(1).reverse
+			  if temp[temp.size-1].to_s == "Kick" || temp[temp.size-1].to_s == "Punt"
+				temp = temp.reverse.drop(1).reverse
+			  end
+			  tempTeamName = ""
+			  temp.each_with_index do |concatenate,i|
+				if (i == temp.size - 1)
+					tempTeamName += concatenate
+				else 
+					tempTeamName += concatenate + " "
+				end
+			  end
+			  stat[:teamName] = tempTeamName
 		    end
 		  
 			player.children.each do |playerStat|
@@ -460,7 +472,7 @@ module ESPN
 		#puts defense
 		
 		#REAL CODE
-		#}
+		}
 		stats
 	  end
 	  
