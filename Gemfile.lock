@@ -1,9 +1,17 @@
-GEM
-  remote: https://rubygems.org/
+GIT
+  remote: https://github.com/cauchychoi/fantasyncaaf.git
+  revision: ab78bd58499ca4d91d285e28dac328c93fd80d57
   specs:
     espn_scraper (1.5.1)
       httparty
       nokogiri
+
+GEM
+  remote: https://rubygems.org/
+  specs:
+    dbi (0.4.5)
+      deprecated (= 2.0.1)
+    deprecated (2.0.1)
     httparty (0.16.0)
       multi_xml (>= 0.5.2)
     mini_portile2 (2.3.0)
@@ -19,7 +27,8 @@ PLATFORMS
   x64-mingw32
 
 DEPENDENCIES
-  espn_scraper (>= 1.5.1)
+  dbi
+  espn_scraper (>= 1.5.1)!
   httparty
   minitest (~> 5.6.0)
   mysql2 (= 0.3.21)

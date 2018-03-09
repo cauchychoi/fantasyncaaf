@@ -23,26 +23,87 @@ puts weeklyStats
 client = Mysql2::Client.new(:host => "us-cdbr-iron-east-05.cleardb.net", :username => "b4078336a46f7e", :password => "10f5241c", :database => "heroku_28ca4c386152c4f")
 puts "Connection successful"
 
-# UPDATE <table> SET column1 = value1, column2=value2 WHERE playerName=<name> AND week=<weekNum>
-
 weeklyStats.each do |statRow|
 	week = statRow[:week]
 	playerID = statRow[:playerID]
 	teamName = statRow[:teamName]
 	#puts statRow
+	queryString = ""
+	statNames = []
+	statValues = []
+	statCount = 0
 
 	statRow.each do |statName, statValue|
 		if (statValue.is_a? String)
 			statValue = statValue.gsub("'", %q(\\\'))
 		end
-				
-		if (statRow.has_key?(:fieldGoalAttempts) && !statName.to_s.eql?("week") && !statName.to_s.eql?("playerID") && !week.to_s.eql?("") && !playerID.to_s.eql?(""))
-			client.query("INSERT INTO kickerStats (week, playerID, #{statName}) VALUES(#{week}, #{playerID}, '#{statValue}') ON DUPLICATE KEY UPDATE #{statName}=VALUES(#{statName})")
-		elsif ((statRow.has_key?(:passAttempts) || statRow.has_key?(:rushingAttempts) || statRow.has_key?(:receptions)) && !statName.to_s.eql?("week") && !statName.to_s.eql?("playerID") && !week.to_s.eql?("") && !playerID.to_s.eql?(""))
-			client.query("INSERT INTO offenseStats (week, playerID, #{statName}) VALUES(#{week}, #{playerID}, '#{statValue}') ON DUPLICATE KEY UPDATE #{statName}=VALUES(#{statName})") 
-		elsif (!statName.to_s.eql?("teamName") && !statName.to_s.eql?("week") && statRow.has_key?(:fumblesRecovered) && !week.to_s.eql?("") && !teamName.to_s.eql?(""))
-			client.query("INSERT INTO overallDefenseStats (week, teamName, #{statName}) VALUES(#{week}, '#{teamName}', '#{statValue}') ON DUPLICATE KEY UPDATE #{statName}=VALUES(#{statName})")
+		
+		statNames[statCount] = statName
+		statValues[statCount] = statValue
+		statCount += 1
+		
+		#if (statRow.has_key?(:fieldGoalAttempts) && !statName.to_s.eql?("week") && !statName.to_s.eql?("playerID") && !week.to_s.eql?("") && !playerID.to_s.eql?(""))
+		#	client.query("INSERT INTO kickerStats (week, playerID, #{statName}) VALUES(#{week}, #{playerID}, '#{statValue}') ON DUPLICATE KEY UPDATE #{statName}=VALUES(#{statName})")
+		#elsif ((statRow.has_key?(:passAttempts) || statRow.has_key?(:rushingAttempts) || statRow.has_key?(:receptions)) && !statName.to_s.eql?("week") && !statName.to_s.eql?("playerID") && !week.to_s.eql?("") && !playerID.to_s.eql?(""))
+		#	client.query("INSERT INTO offenseStats (week, playerID, #{statName}) VALUES(#{week}, #{playerID}, '#{statValue}') ON DUPLICATE KEY UPDATE #{statName}=VALUES(#{statName})") 
+		#elsif (!statName.to_s.eql?("teamName") && !statName.to_s.eql?("week") && statRow.has_key?(:fumblesRecovered) && !week.to_s.eql?("") && !teamName.to_s.eql?(""))
+		#	client.query("INSERT INTO defenseStats (week, teamName, #{statName}) VALUES(#{week}, '#{teamName}', '#{statValue}') ON DUPLICATE KEY UPDATE #{statName}=VALUES(#{statName})")
+		#end
+	end
+	
+	if (statRow.has_key?(:fieldGoalAttempts))
+		tableName = "kickerStats"
+	elsif (statRow.has_key?(:passAttempts) || statRow.has_key?(:rushingAttempts) || statRow.has_key?(:receptions))
+		tableName = "offenseStats"
+	elsif (statRow.has_key?(:fumblesRecovered))
+		tableName = "defenseStats"
+	end
+	
+	queryString = "INSERT INTO #{tableName} ("
+	statNames.each_with_index do |insert, index|
+		if index == statNames.size - 1
+			queryString += insert.to_s + ") VALUES("
+		else 
+			queryString += insert.to_s + ", "
 		end
+	end
+	
+	statValues.each_with_index do |insert, index|
+		if index == statValues.size - 1
+			queryString += "'" + insert.to_s + "') ON DUPLICATE KEY UPDATE "
+		else
+			queryString += "'" + insert.to_s + "', "
+		end
+	end
+	
+	statNames.each_with_index do |insert, index|
+		if (!insert.to_s.eql?("week"))
+			if (tableName.eql?("defenseStats"))
+				if (!insert.to_s.eql?("teamName"))
+					if index == statNames.size - 1
+						queryString += insert.to_s + "=VALUES(" + insert.to_s + ")"
+					else
+						queryString += insert.to_s + "=VALUES(" + insert.to_s + "), "
+					end
+				end
+			else
+				if (!insert.to_s.eql?("playerID"))
+					if index == statNames.size - 1
+						queryString += insert.to_s + "=VALUES(" + insert.to_s + ")"
+					else
+						queryString += insert.to_s + "=VALUES(" + insert.to_s + "), "
+					end
+				end
+			end
+		end
+	end
+	
+	#puts queryString
+	
+	if (!week.to_s.eql?("") && !playerID.to_s.eql?("") && (tableName.eql?("offenseStats") || tableName.eql?("kickerStats")))
+		client.query(queryString)
+	elsif (!week.to_s.eql?("") && !teamName.to_s.eql?("") && tableName.eql?("defenseStats"))
+		client.query(queryString)
 	end
 end
 
