@@ -6,5 +6,5 @@ gem 'nokogiri'
 gem 'minitest', '~> 5.6.0'
 gem 'mysql2', '0.3.21'
 gem 'pg'
-gem 'espn_scraper', '>=1.5.0', :git => "git://github.com/cauchychoi/fantasyncaaf.git"
+gem 'espn_scraper', '>=1.5.0'
 ruby '2.4.3'
