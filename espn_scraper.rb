@@ -1,6 +1,6 @@
 #!/usr/bin/ruby -w
 
-require '/app/vendor/bundle/ruby/2.4.0/gems/espn_scraper-1.5.0'
+require 'espn_scraper'
 #require 'rubygems'
 #gem 'dbi'
 #require 'dbi'
