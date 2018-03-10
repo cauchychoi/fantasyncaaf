@@ -6,3 +6,5 @@ Rake::TestTask.new do |t|
 end
 
 task default: :test
+
+load './lib/tasks/scheduler.rake'
