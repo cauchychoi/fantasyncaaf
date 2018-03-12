@@ -73,6 +73,12 @@ module ESPN
 
   class << self
 
+	def get_All_Rosters()
+		teamIDs = Scores.get_teamIDs()
+		roster = Scores.get_Roster(teamIDs)
+		roster
+	end
+  
     def get_nfl_scores(year, week)
       markup = Scores.markup_from_year_and_week('nfl', year, week)
       scores = Scores.home_away_parse(markup)
@@ -169,7 +175,7 @@ module ESPN
         day = date.to_s.gsub(/[^\d]+/, '')
         ESPN.get league, 'scoreboard', '_', 'group', conference_id.to_s, 'date', day
       end
-
+	  
       # parsing strategies
 
       def home_away_parse(doc, date=nil)
@@ -246,6 +252,41 @@ module ESPN
         scores
       end
 
+	  def get_teamIDs()
+		teamIDs = []
+
+		teamNames = []
+		count = 0
+		doc = ESPN.get 'scores', 'college-football', "teams"
+		doc.xpath("//li/h5").each do |team|
+			teamID = {}
+			#puts team.content
+			teamID[:teamName] = team.content
+			team.next.children.each do |info|
+				if (info.content == "Roster")
+					teamLink = info['href']
+					teamLink = teamLink[5..-1] # get rid of /ncf/
+					teamID[:link] = teamLink
+					#puts teamLink
+					#teamIDs << teamLink
+					teamIDs << teamID
+				end
+			end
+			
+		end
+		#puts teamIDs
+		#doc.xpath("//li/span").each do |team|
+		#	team.children.each do |info|
+		#		if (info.content == "Roster")
+		#			teamLink = info['href']
+		#			teamLink = teamLink[5..-1] # get rid of /ncf/
+		#			teamIDs << teamLink
+		#		end
+		#	end
+		#end
+		teamIDs
+	  end
+	  
 	  def get_gameIDs(doc)
         #scores = []
         games = []
@@ -292,6 +333,37 @@ module ESPN
 		uid
         #scores
       end
+	  
+	  def get_Roster(teamIDs)
+	  roster = []
+		teamIDs.each { |teamID|
+			html = ESPN.get 'scores', 'college-football', teamID[:link]
+			html.xpath("//tr").each do |playerRow|
+				statNum = 0
+				playerStats = {}
+				playerStats[:teamName] = teamID[:teamName]
+				if playerRow['class'] == "oddrow" || playerRow['class'] == "evenrow"
+					playerRow.children.each do |playerInfo|
+						#playerInfo.children.each do |i|
+							playerLink = playerInfo.child['href']
+							if playerLink =~ /id\/([^\/]+)\//
+								playerStats[:playerID] = $~[1]
+							end
+						#end
+						if statNum == 1
+							playerStats[:playerName] = playerInfo.content
+						elsif statNum == 2
+							playerStats[:position] = playerInfo.content
+						end
+						statNum += 1
+					end
+				end
+				roster << playerStats
+				#puts playerStats
+			end
+		}
+	  roster
+	  end
 	  
 	  def get_stats(pages, week)
 		#ESPN.get 'scores', league, "scoreboard/_/group/#{group}/year/#{year}/seasontype/2/week/#{week}"
