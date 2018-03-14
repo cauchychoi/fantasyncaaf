@@ -64,6 +64,10 @@ puts weeklyStats
 client = Mysql2::Client.new(:host => "us-cdbr-iron-east-05.cleardb.net", :username => "b4078336a46f7e", :password => "10f5241c", :database => "heroku_28ca4c386152c4f")
 puts "Connection successful"
 
+client.query("truncate offensestats")
+client.query("truncate defensestats")
+client.query("truncate kickerstats")
+
 weeklyStats.each do |statRow|
 	week = statRow[:week]
 	playerID = statRow[:playerID]
@@ -158,10 +162,8 @@ weeklyStats.each do |statRow|
 	#puts queryString
 	
 	if (!week.to_s.eql?("") && !playerID.to_s.eql?("") && (tableName.eql?("offenseStats") || tableName.eql?("kickerStats")))
-		client.query("truncate " + tableName)
 		client.query(queryString)
 	elsif (!week.to_s.eql?("") && !teamName.to_s.eql?("") && tableName.eql?("defenseStats"))
-		client.query("truncate " + tableName)
 		client.query(queryString)
 	end
 end
