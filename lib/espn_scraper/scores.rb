@@ -447,25 +447,25 @@ module ESPN
 				  #stat[:comp_att] = playerStat.content
 				  stat[:completedPasses] = playerStat.content.partition('/').first
 				  stat[:passAttempts] = playerStat.content.partition('/').last
-			   elsif playerStat['class'] == "yds" && player.parent.parent.parent.child.child.content.split.last == "Passing"
+			   elsif playerStat['class'] == "yds" && player.parent.parent.parent.child.child.content.split.include?("Passing")
 			      stat[:passingYards] = playerStat.content
-			   elsif playerStat['class'] == "yds" && player.parent.parent.parent.child.child.content.split.last == "Rushing"
+			   elsif playerStat['class'] == "yds" && player.parent.parent.parent.child.child.content.split.include?("Rushing")
 			      stat[:rushingYards] = playerStat.content
-			   elsif playerStat['class'] == "yds" && player.parent.parent.parent.child.child.content.split.last == "Receiving"
+			   elsif playerStat['class'] == "yds" && player.parent.parent.parent.child.child.content.split.include?("Receiving")
 				  stat[:receivingYards] = playerStat.content
-			   elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split.last == "Passing"
+			   elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split.include?("Passing")
 				  stat[:passingTDs] = playerStat.content
-			   elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split.last == "Rushing"
+			   elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split.include?("Rushing")
 			      stat[:rushingTDs] = playerStat.content
-			   elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split.last == "Receiving"
+			   elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split.include?("Receiving")
 			      stat[:receivingTDs] = playerStat.content
-			   elsif playerStat['class'] == "int" && player.parent.parent.parent.child.child.content.split.last == "Passing"
+			   elsif playerStat['class'] == "int" && player.parent.parent.parent.child.child.content.split.include?("Passing")
 				  stat[:passingInterceptions] = playerStat.content
 			   elsif playerStat['class'] == "car"
 				  stat[:rushingAttempts] = playerStat.content
-			   elsif playerStat['class'] == "rec" && player.parent.parent.parent.child.child.content.split.last == "Receiving"
+			   elsif playerStat['class'] == "rec" && player.parent.parent.parent.child.child.content.split.include?("Receiving")
 				  stat[:receptions] = playerStat.content
-			   elsif playerStat['class'] == "lost" && player.parent.parent.parent.child.child.content.split.last == "Fumbles"
+			   elsif playerStat['class'] == "lost" && player.parent.parent.parent.child.child.content.split.include?("Fumbles")
 				  stat[:fumblesLost] = playerStat.content
 				  if (stat[:teamName] == teamNames[0])
 				    team1FumRec += playerStat.content.to_i
@@ -475,42 +475,42 @@ module ESPN
 			   
 			   #Defense
 			   #elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split[1] == "Defense"
-			   elsif playerStat['class'] == "sacks" && player.parent.parent.parent.child.child.content.split.last == "Defense"
+			   elsif playerStat['class'] == "sacks" && player.parent.parent.parent.child.child.content.split.include?("Defense")
 				  if (stat[:teamName] == teamNames[0])
 					team0Sacks += playerStat.content.to_i
 				  else
 				    team1Sacks += playerStat.content.to_i
 				  end
 				  
-			   elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split.last == "Defense"
+			   elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split.include?("Defense")
 				  if (stat[:teamName] == teamNames[0])
 					team0DefensiveTDs += playerStat.content.to_i
 				  else
 				    team1DefensiveTDs += playerStat.content.to_i
 				  end
 			   
-			   elsif playerStat['class'] == "int" && player.parent.parent.parent.child.child.content.split.last == "Interceptions"
+			   elsif playerStat['class'] == "int" && player.parent.parent.parent.child.child.content.split.include?("Interceptions")
 				  if (stat[:teamName] == teamNames[0])
 					team0Ints += playerStat.content.to_i
 				  else
 				    team1Ints += playerStat.content.to_i
 				  end
 				  
-			   elsif playerStat['class'] == "yds" && player.parent.parent.parent.child.child.content.split.last == "Interceptions"
+			   elsif playerStat['class'] == "yds" && player.parent.parent.parent.child.child.content.split.include?("Interceptions")
 				  if (stat[:teamName] == teamNames[0])
 					team0IntYards += playerStat.content.to_i
 				  else
 				    team1IntYards += playerStat.content.to_i
 				  end				  
 
-			   elsif playerStat['class'] == "yds" && (player.parent.parent.parent.child.child.content.split[1] == "Kick" || player.parent.parent.parent.child.child.content.split[2] == "Kick")
+			   elsif playerStat['class'] == "yds" && (player.parent.parent.parent.child.child.content.include?("Kick"))
 				  if (stat[:teamName] == teamNames[0])
 					team0KickRet += playerStat.content.to_i
 				  else
 				    team1KickRet += playerStat.content.to_i
 				  end
 
-			   elsif playerStat['class'] == "yds" && (player.parent.parent.parent.child.child.content.split[1] == "Punt" || player.parent.parent.parent.child.child.content.split[2] == "Punt")
+			   elsif playerStat['class'] == "yds" && (player.parent.parent.parent.child.child.content.include?("Punt"))
 				  if (stat[:teamName] == teamNames[0])
 					team0PuntRet += playerStat.content.to_i
 				  else
