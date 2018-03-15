@@ -1,5 +1,7 @@
 #!/usr/bin/ruby -w
 
+#scheduler: bundle exec rake update_scores
+
 require 'espn_scraper'
 #require 'rubygems'
 #gem 'dbi'
@@ -10,40 +12,89 @@ puts ESPN.responding?
 #puts ESPN.get_teams_in('ncf')
 #ESPN.get_ncf_scores(2017, 11)
 weeklyStats = ESPN.get_pac12_games(2017, 12)
+#puts weeklyStats
+schedule = ESPN.get_schedule(2017, 9)
+#puts schedule
 
 def calculateScores(stats)
 	stats.each do |statRow|
+		#puts statRow
 		score = 0
+		fieldGoalAttempts = 0
 		statRow.each do |statName, statValue|
-			#if statRow.has_key?(:passAttempts) || statRow.has_key?(:rushingAttempts) || statRow.has_key?(:receptions)
-				if statName.to_s.eql?("passingYards")
-					score += statValue.to_f/25.0
-				elsif statName.to_s.eql?("passingTDs")
-					score += statValue.to_f * 4
-				elsif statName.to_s.eql?("passingInterceptions") || statName.to_s.eql?("fumblesLost")
-					score -= statValue.to_f * 2
-				elsif statName.to_s.eql?("rushingYards") || statName.to_s.eql?("receivingYards")
-					score += statValue.to_f/10.0
-				elsif statName.to_s.eql?("rushingTDs") || statName.to_s.eql?("receivingTDs")
-					score += statValue.to_f * 6
-				elsif statName.to_s.eql?("receptions") # Half PPR
-					score += (statValue.to_f)*0.5
-				elsif statName.to_s.eql?("fumblesLost")
-					score -= statValue.to_f * 2
+			if statName.to_s.eql?("passingYards")
+				score += statValue.to_f * 0.04
+			elsif statName.to_s.eql?("passingTDs")
+				score += statValue.to_f * 4
+			elsif statName.to_s.eql?("passingInterceptions") || statName.to_s.eql?("fumblesLost")
+				score -= statValue.to_f * 2
+			elsif statName.to_s.eql?("rushingYards") || statName.to_s.eql?("receivingYards")
+				score += statValue.to_f/10.0
+			elsif statName.to_s.eql?("rushingTDs") || statName.to_s.eql?("receivingTDs")
+				score += statValue.to_f * 6
+			#elsif statName.to_s.eql?("receptions") # Half PPR
+			#	score += (statValue.to_f)*0.5
+			elsif statName.to_s.eql?("fumblesLost")
+				score -= statValue.to_f * 2
 				
-			#elsif statRow.has_key?(:fumblesRecovered)
-				elsif statName.to_s.eql?("fumblesRecovered") || statName.to_s.eql?("interceptions")
-					score += statValue.to_f * 2
-				elsif statName.to_s.eql?("sacks")
-					score += statValue.to_f * 1
-				elsif statName.to_s.eql?("TDs")
-					score += statValue.to_f * 6
-				
-			#elsif statRow.has_key?(:fieldGoalAttempts)
-				elsif statName.to_s.eql?("extraPoints")
-					score += statValue.to_f * 1
+			elsif statName.to_s.eql?("fumblesRecovered") || statName.to_s.eql?("interceptions")
+				score += statValue.to_f * 2
+			elsif statName.to_s.eql?("sacks")
+				score += statValue.to_f * 1
+			elsif statName.to_s.eql?("TDs")
+				score += statValue.to_f * 6
+			elsif statName.to_s.eql?("yardsAllowed")
+				if statValue.to_f < 100
+					score += 5
+				elsif statValue.to_f < 200
+					score += 3
+				elsif statValue.to_f < 300
+					score += 2
+				elsif statValue.to_f < 350
+					score += 0
+				elsif statValue.to_f < 400
+					score -= 1
+				elsif statValue.to_f < 450
+					score -= 3
+				elsif statValue.to_f < 500
+					score -= 5
+				elsif statValue.to_f < 550
+					score -= 6
+				else
+					score -= 7
 				end
-			#end
+			elsif statName.to_s.eql?("pointsAllowed")
+				if statValue.to_f < 1
+					score += 5
+				elsif statValue.to_f < 7
+					score += 4
+				elsif statValue.to_f < 14
+					score += 3
+				elsif statValue.to_f < 18
+					score += 1
+				elsif statValue.to_f < 28
+					score += 0
+				elsif statValue.to_f < 35
+					score -= 1
+				elsif statValue.to_f < 46
+					score -= 3
+				else
+					score -= 5
+				end
+			
+			elsif statName.to_s.eql?("extraPoints")
+				score += statValue.to_f * 1
+			elsif statName.to_s.eql?("fieldGoalAttempts")
+				fieldGoalAttempts = statValue.to_f
+			elsif statName.to_s.eql?("fieldGoalsMade")
+				score -= fieldGoalAttempts - statValue.to_f
+			elsif statName.to_s.eql?("shortFGsMade")
+				score += statValue.to_f * 3
+			elsif statName.to_s.eql?("medFGsMade")
+				score += statValue.to_f * 4
+			elsif statName.to_s.eql?("longFGsMade")
+				score += statValue.to_f * 5	
+			end
 		end
 		statRow[:fantasyPoints] = score
 	end
@@ -51,7 +102,7 @@ def calculateScores(stats)
 end
 
 weeklyStats = calculateScores(weeklyStats)
-puts weeklyStats
+#puts weeklyStats
 #dbh = DBI.connect("DBI:Mysql:localhost:id3779293_ncaafstats", "id3779293_jcl", "jeffcauchylonny")
 
 #client = Mysql2::Client.new(:host => "localhost", :username => "root")
@@ -67,6 +118,22 @@ puts "Connection successful"
 client.query("truncate offensestats")
 client.query("truncate defensestats")
 client.query("truncate kickerstats")
+
+# Populating gametimes table
+schedule.each do |game|
+	game.each do |row|
+		queryString = "INSERT INTO gametimes (week, team, gameTime) VALUES("
+		row.each_with_index do |(key,value),i|
+			if i == row.size - 1
+				queryString += "'" + value.to_s + "') ON DUPLICATE KEY UPDATE week=VALUES(week), team=VALUES(team), gameTime=VALUES(gameTime)"
+			else
+				queryString += "'" + value.to_s + "', "
+			end
+		end
+		client.query(queryString)
+	end
+
+end
 
 weeklyStats.each do |statRow|
 	week = statRow[:week]

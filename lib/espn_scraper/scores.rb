@@ -119,8 +119,19 @@ module ESPN
 	def get_pac12_games(year, week)
 	  markup = Scores.markup_from_year_week_conf('college-football', year, week, 9)
 	  gameIDs = Scores.get_gameIDs(markup)
-	  pac12Weekly = Scores.get_stats(gameIDs, week)
+	  pac12Weekly = Scores.get_stats_boxscore(gameIDs, week)
+	  #pac12Weekly = Scores.get_stats_summary(gameIDs, week, pac12Weekly)
 	  pac12Weekly
+	end
+	
+	def get_schedule(year, conf)
+		seasonSchedule = []
+		for week in 1..13
+			markup = Scores.markup_from_year_week_conf('college-football', year, week, conf)
+			weekSchedule = Scores.get_gameTimes(markup, week)
+			seasonSchedule << weekSchedule
+		end
+		seasonSchedule
 	end
 	
     def get_ncb_scores(date, conference_id)
@@ -306,11 +317,6 @@ module ESPN
 		  uidLong = game['uid']
 		  uidShort = uidLong[-9..-1]
 		  uid[count] = uidShort
-		  #score = { league: 'college-football' }
-          #competition = game['competitions'].first
-          #date = DateTime.parse(competition['startDate'])
-          #date = date.new_offset('-06:00')
-          #score[:game_date] = date.to_date
 		  
 		  
           # Score must be final
@@ -330,7 +336,49 @@ module ESPN
 		  count += 1
         end
 		
-		uid
+		uid  #returns list of game IDs
+        #scores
+      end
+	  
+	  def get_gameTimes(doc, week)
+        weekSchedule = []
+		games = []
+		espn_regex = /window\.espn\.scoreboardData \t= (\{.*?\});/
+        doc.xpath("//script").each do |script_section|
+          if script_section.content =~ espn_regex
+            espn_data = JSON.parse(espn_regex.match(script_section.content)[1])
+            games = espn_data['events']
+            break
+          end
+        end
+        games.each do |game|
+		  gameSchedule = {}
+		  teamArray = []
+          competition = game['competitions'].first
+		  teams = competition['competitors']
+		  teams.each do |team|
+			displayName = team['team']['displayName']
+			displayName.slice!(team['team']['shortDisplayName'])  #isolate school name. e.g. displayName = USC Trojans, shortDisplayName = Trojans
+			displayName = displayName.strip
+			teamArray.push(displayName)
+		  end
+		  
+		  
+          dateTime = DateTime.parse(competition['startDate']).strftime('%Y-%m-%d %H:%M:%S') #formatting for MySQL
+		  
+		  teamArray.each do |teamName|
+			gameSchedule[:week] = week
+			gameSchedule[:team] = teamName
+
+			gameSchedule[:gametime] = dateTime
+		  end
+		  
+          #date = date.new_offset('-08:00') #convert from GMT to PST
+          
+		  weekSchedule << gameSchedule
+		end
+		
+		weekSchedule  #returns list of game IDs
         #scores
       end
 	  
@@ -365,9 +413,55 @@ module ESPN
 	  roster
 	  end
 	  
-	  def get_stats(pages, week)
+	  def get_kicker_scores(playerID, gameID)
+		html = ESPN.get 'scores', 'college-football', "player/_/id/#{playerID}"
+		#puts playerID
+		#puts gameID
+		kickerStats = []
+		getStats = 5
+		html.xpath("//tr").each do |row|
+			if row['class'] == "oddrow" || row['class'] == "evenrow"
+				row.children.each do |tdrow|
+					if (getStats < 5)
+						#puts tdrow
+						if (getStats == 0)
+							kickerStats[0] = tdrow.content.partition('/').first.to_i
+							getStats += 1
+						elsif (getStats == 1 || getStats == 2)
+							kickerStats[0] += tdrow.content.partition('/').first.to_i
+							getStats += 1
+						elsif (getStats == 3)
+							kickerStats[1] = tdrow.content.partition('/').first.to_i
+							getStats += 1
+						elsif (getStats == 4)
+							kickerStats[2] = tdrow.content.partition('/').first.to_i
+							getStats += 1
+						end
+					end
+					
+					tdrow.children.each do |findGame| # find the right game, set getStats to 0 and only iterate through that game
+						if findGame['href'].to_s.include?("#{gameID}")
+							#puts findGame['href']
+							#puts gameID
+							getStats = 0
+						end
+					end
+				end
+			end
+		end
+		#puts kickerStats
+		kickerStats
+	  end
+	  
+	  def get_stats_boxscore(pages, week)
 		#ESPN.get 'scores', league, "scoreboard/_/group/#{group}/year/#{year}/seasontype/2/week/#{week}"
 		stats = []
+		
+
+		
+		#REAL CODE
+		pages.each { |page|
+		html = ESPN.get 'scores', 'college-football', "boxscore?gameId=#{page}"
 		
 		# Variables for defense
 		teamCount = 0
@@ -389,10 +483,8 @@ module ESPN
 		team1PuntRet = 0
 		team0FumRec = 0
 		team1FumRec = 0
-		
-		#REAL CODE
-		pages.each { |page|
-		html = ESPN.get 'scores', 'college-football', "boxscore?gameId=#{page}"
+		team0YdsAllowed = 0
+		team1YdsAllowed = 0
 		
 		#DEBUG
 		#html = ESPN.get 'scores', 'college-football', "boxscore?gameId=#{pages[0]}"
@@ -416,15 +508,20 @@ module ESPN
 				end
 			  end
 			  stat[:teamName] = tempTeamName
+			  teamNames[teamCount] = tempTeamName
+			  teamCount += 1
+			  
+			  #puts tempTeamName
 		    end
 		  
 			player.children.each do |playerStat|
 			
 			   #Defense team name and final score
-			   if playerStat['class'] == "team-name"
-				teamNames[teamCount] = playerStat.content
-				teamCount += 1
-			   elsif playerStat['class'] == "final-score"
+			   #if playerStat['class'] == "team-name"
+				#teamNames[teamCount] = playerStat.content
+				#teamCount += 1
+				#puts teamNames
+			   if playerStat['class'] == "final-score"
 				finalScores[finalScoreCount] = playerStat.content
 				finalScoreCount += 1
 			   
@@ -451,8 +548,18 @@ module ESPN
 			      stat[:passingYards] = playerStat.content
 			   elsif playerStat['class'] == "yds" && player.parent.parent.parent.child.child.content.split.include?("Rushing")
 			      stat[:rushingYards] = playerStat.content
+				  if (stat[:teamName] == teamNames[0])
+					team1YdsAllowed += playerStat.content.to_i
+				  elsif (stat[:teamName] == teamNames[1])
+					team0YdsAllowed += playerStat.content.to_i
+				  end
 			   elsif playerStat['class'] == "yds" && player.parent.parent.parent.child.child.content.split.include?("Receiving")
 				  stat[:receivingYards] = playerStat.content
+				  if (stat[:teamName] == teamNames[0])
+					team1YdsAllowed += playerStat.content.to_i
+				  elsif (stat[:teamName] == teamNames[1])
+					team0YdsAllowed += playerStat.content.to_i
+				  end
 			   elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split.include?("Passing")
 				  stat[:passingTDs] = playerStat.content
 			   elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split.include?("Rushing")
@@ -469,7 +576,7 @@ module ESPN
 				  stat[:fumblesLost] = playerStat.content
 				  if (stat[:teamName] == teamNames[0])
 				    team1FumRec += playerStat.content.to_i
-				  else
+				  elsif (stat[:teamName] == teamNames[1])
 				    team0FumRec += playerStat.content.to_i
 				  end
 			   
@@ -478,42 +585,42 @@ module ESPN
 			   elsif playerStat['class'] == "sacks" && player.parent.parent.parent.child.child.content.split.include?("Defense")
 				  if (stat[:teamName] == teamNames[0])
 					team0Sacks += playerStat.content.to_i
-				  else
+				  elsif (stat[:teamName] == teamNames[1])
 				    team1Sacks += playerStat.content.to_i
 				  end
 				  
 			   elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split.include?("Defense")
 				  if (stat[:teamName] == teamNames[0])
 					team0DefensiveTDs += playerStat.content.to_i
-				  else
+				  elsif (stat[:teamName] == teamNames[1])
 				    team1DefensiveTDs += playerStat.content.to_i
 				  end
 			   
 			   elsif playerStat['class'] == "int" && player.parent.parent.parent.child.child.content.split.include?("Interceptions")
 				  if (stat[:teamName] == teamNames[0])
 					team0Ints += playerStat.content.to_i
-				  else
+				  elsif (stat[:teamName] == teamNames[1])
 				    team1Ints += playerStat.content.to_i
 				  end
 				  
 			   elsif playerStat['class'] == "yds" && player.parent.parent.parent.child.child.content.split.include?("Interceptions")
 				  if (stat[:teamName] == teamNames[0])
 					team0IntYards += playerStat.content.to_i
-				  else
+				  elsif (stat[:teamName] == teamNames[1])
 				    team1IntYards += playerStat.content.to_i
 				  end				  
 
-			   elsif playerStat['class'] == "yds" && (player.parent.parent.parent.child.child.content.include?("Kick"))
+			   elsif playerStat['class'] == "yds" && (player.parent.parent.parent.child.child.content.include?("Kick Returns"))
 				  if (stat[:teamName] == teamNames[0])
 					team0KickRet += playerStat.content.to_i
-				  else
+				  elsif (stat[:teamName] == teamNames[1])
 				    team1KickRet += playerStat.content.to_i
 				  end
 
-			   elsif playerStat['class'] == "yds" && (player.parent.parent.parent.child.child.content.include?("Punt"))
+			   elsif playerStat['class'] == "yds" && (player.parent.parent.parent.child.child.content.include?("Punt Returns"))
 				  if (stat[:teamName] == teamNames[0])
 					team0PuntRet += playerStat.content.to_i
-				  else
+				  elsif (stat[:teamName] == teamNames[1])
 				    team1PuntRet += playerStat.content.to_i
 				  end
 				  
@@ -528,13 +635,24 @@ module ESPN
 			end
 		  end
 
+		  # IF KICKER, GO TO KICKER PLAYER PAGE AND GET STATS
+		  if stat.has_key?(:fieldGoalAttempts)
+			kickerStats = get_kicker_scores(stat[:playerID], page) # returns an array of length 3 for 0-39, 40-49, 50+ yards
+			stat[:shortFGsMade] = kickerStats[0]
+			stat[:medFGsMade] = kickerStats[1]
+			stat[:longFGsMade] = kickerStats[2]
+				
+			#WAITING FOR JEFF TO ADD COLUMNS TO THE KICKERSTATS TABLE
+		  end
+		  
+		  
 		  if stat != {}
 			stats << stat
 		  end
 		end
 		
-		team0Defense = {:week => week, :teamName => teamNames[0], :fumblesRecovered => team0FumRec.to_s, :pointsAllowed => finalScores[1], :sacks => team0Sacks.to_s, :TDs => team0DefensiveTDs.to_s, :interceptions => team0Ints.to_s, :interceptionYards => team0IntYards.to_s, :kickReturnYards => team0KickRet.to_s, :puntReturnYards => team0PuntRet.to_s}
-		team1Defense = {:week => week, :teamName => teamNames[1], :fumblesRecovered => team1FumRec.to_s, :pointsAllowed => finalScores[0], :sacks => team1Sacks.to_s, :TDs => team1DefensiveTDs.to_s, :interceptions => team1Ints.to_s, :interceptionYards => team1IntYards.to_s, :kickReturnYards => team1KickRet.to_s, :puntReturnYards => team1PuntRet.to_s}
+		team0Defense = {:week => week, :teamName => teamNames[0], :fumblesRecovered => team0FumRec.to_s, :pointsAllowed => finalScores[1], :sacks => team0Sacks.to_s, :TDs => team0DefensiveTDs.to_s, :interceptions => team0Ints.to_s, :interceptionYards => team0IntYards.to_s, :kickReturnYards => team0KickRet.to_s, :puntReturnYards => team0PuntRet.to_s, :yardsAllowed => team0YdsAllowed.to_s}
+		team1Defense = {:week => week, :teamName => teamNames[1], :fumblesRecovered => team1FumRec.to_s, :pointsAllowed => finalScores[0], :sacks => team1Sacks.to_s, :TDs => team1DefensiveTDs.to_s, :interceptions => team1Ints.to_s, :interceptionYards => team1IntYards.to_s, :kickReturnYards => team1KickRet.to_s, :puntReturnYards => team1PuntRet.to_s, :yardsAllowed => team1YdsAllowed.to_s}
 
 		stats << team0Defense
 		stats << team1Defense
@@ -546,6 +664,43 @@ module ESPN
 		#REAL CODE
 		}
 		stats
+	  end
+	  
+	  def get_stats_summary(pages, week, stats)
+		pages.each { |page|
+			doc = ESPN.get 'scores', 'college-football', "game?gameId=#{page}"
+			espn_regex = /espn\.gamepackage\.probability\.data = (\[.*?\]);/
+			doc.xpath("//script").each do |script_section|
+				#puts script_section
+				if script_section.content =~ espn_regex
+					espn_data = JSON.parse(espn_regex.match(script_section.content)[1])
+					#puts espn_data.size
+					#plays = espn_data[1]['play']
+					
+					unless espn_data.nil?
+						espn_data.each do |group|
+						group.each do |play|
+						if play[0].to_s.eql?("play")
+							playStats = play[1]
+							if playStats['type']['id'].to_s.eql?("59")  #59 = FG Good
+								puts playStats['text']
+							end
+						end
+						
+						end
+						
+						#if (play['type']['id'] == "59")
+						#	puts play
+						#end
+					end
+					end
+					
+					#break
+				end
+				#puts espn_data
+
+			end
+		}
 	  end
 	  
       def winner_loser_parse(doc, date)
