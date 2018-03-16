@@ -13,6 +13,7 @@ puts ESPN.responding?
 #ESPN.get_ncf_scores(2017, 11)
 weeklyStats = ESPN.get_pac12_games(2017, 12)
 #puts weeklyStats
+
 schedule = ESPN.get_schedule(2017, 9)
 #puts schedule
 
@@ -81,6 +82,8 @@ def calculateScores(stats)
 				else
 					score -= 5
 				end
+			elsif statName.to_s.eql?("safeties")
+				score += statValue.to_f * 2
 			
 			elsif statName.to_s.eql?("extraPoints")
 				score += statValue.to_f * 1
@@ -138,7 +141,7 @@ end
 weeklyStats.each do |statRow|
 	week = statRow[:week]
 	playerID = statRow[:playerID]
-	teamName = statRow[:teamName]
+	teamID = statRow[:teamID]
 	#puts statRow
 	queryString = ""
 	statNames = []
@@ -167,7 +170,7 @@ weeklyStats.each do |statRow|
 		tableName = "kickerStats"
 	elsif (statRow.has_key?(:passAttempts) || statRow.has_key?(:rushingAttempts) || statRow.has_key?(:receptions) || statRow.has_key?(:fumblesLost))
 		tableName = "offenseStats"
-	elsif (statRow.has_key?(:fumblesRecovered))
+	elsif (statRow.has_key?(:fumblesRecovered) || statRow.has_key?(:safeties))
 		tableName = "defenseStats"
 	end
 	
@@ -191,7 +194,7 @@ weeklyStats.each do |statRow|
 	statNames.each_with_index do |insert, index|
 		if (!insert.to_s.eql?("week"))
 			if (tableName.eql?("defenseStats"))
-				if (!insert.to_s.eql?("teamName"))
+				if (!insert.to_s.eql?("teamID"))
 					if insert.to_s.eql?("fantasyPoints")
 						if index == statNames.size - 1
 							queryString += insert.to_s + "=" + insert.to_s + "+VALUES(" + insert.to_s + ")"
@@ -230,7 +233,7 @@ weeklyStats.each do |statRow|
 	
 	if (!week.to_s.eql?("") && !playerID.to_s.eql?("") && (tableName.eql?("offenseStats") || tableName.eql?("kickerStats")))
 		client.query(queryString)
-	elsif (!week.to_s.eql?("") && !teamName.to_s.eql?("") && tableName.eql?("defenseStats"))
+	elsif (!week.to_s.eql?("") && !teamID.to_s.eql?("") && tableName.eql?("defenseStats"))
 		client.query(queryString)
 	end
 end

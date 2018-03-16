@@ -120,7 +120,7 @@ module ESPN
 	  markup = Scores.markup_from_year_week_conf('college-football', year, week, 9)
 	  gameIDs = Scores.get_gameIDs(markup)
 	  pac12Weekly = Scores.get_stats_boxscore(gameIDs, week)
-	  #pac12Weekly = Scores.get_stats_summary(gameIDs, week, pac12Weekly)
+	  pac12Weekly = Scores.get_stats_summary(gameIDs, week, pac12Weekly)
 	  pac12Weekly
 	end
 	
@@ -457,13 +457,28 @@ module ESPN
 		#ESPN.get 'scores', league, "scoreboard/_/group/#{group}/year/#{year}/seasontype/2/week/#{week}"
 		stats = []
 		
-
-		
 		#REAL CODE
 		pages.each { |page|
 		html = ESPN.get 'scores', 'college-football', "boxscore?gameId=#{page}"
 		
-		# Variables for defense
+		#Get Team IDs
+		awayTeamId = ""
+		homeTeamId = ""
+			
+		awayTeamIdRegex = /espn\.gamepackage\.awayTeamId = (\".*?\");/
+		html.xpath("//script").each do |script_section|
+			if script_section.content =~ awayTeamIdRegex
+				awayTeamId = JSON.parse(awayTeamIdRegex.match(script_section.content)[1])
+			end
+		end
+		homeTeamIdRegex = /espn\.gamepackage\.homeTeamId = (\".*?\");/
+		html.xpath("//script").each do |script_section|
+			if script_section.content =~ homeTeamIdRegex
+				homeTeamId = JSON.parse(homeTeamIdRegex.match(script_section.content)[1])
+			end
+		end
+		
+		# Variables for defense. team0 = away, team1 = home
 		teamCount = 0
 		teamNames = []
 		finalScores = []
@@ -641,8 +656,6 @@ module ESPN
 			stat[:shortFGsMade] = kickerStats[0]
 			stat[:medFGsMade] = kickerStats[1]
 			stat[:longFGsMade] = kickerStats[2]
-				
-			#WAITING FOR JEFF TO ADD COLUMNS TO THE KICKERSTATS TABLE
 		  end
 		  
 		  
@@ -651,8 +664,8 @@ module ESPN
 		  end
 		end
 		
-		team0Defense = {:week => week, :teamName => teamNames[0], :fumblesRecovered => team0FumRec.to_s, :pointsAllowed => finalScores[1], :sacks => team0Sacks.to_s, :TDs => team0DefensiveTDs.to_s, :interceptions => team0Ints.to_s, :interceptionYards => team0IntYards.to_s, :kickReturnYards => team0KickRet.to_s, :puntReturnYards => team0PuntRet.to_s, :yardsAllowed => team0YdsAllowed.to_s}
-		team1Defense = {:week => week, :teamName => teamNames[1], :fumblesRecovered => team1FumRec.to_s, :pointsAllowed => finalScores[0], :sacks => team1Sacks.to_s, :TDs => team1DefensiveTDs.to_s, :interceptions => team1Ints.to_s, :interceptionYards => team1IntYards.to_s, :kickReturnYards => team1KickRet.to_s, :puntReturnYards => team1PuntRet.to_s, :yardsAllowed => team1YdsAllowed.to_s}
+		team0Defense = {:week => week, :teamName => teamNames[0], :fumblesRecovered => team0FumRec.to_s, :pointsAllowed => finalScores[1], :sacks => team0Sacks.to_s, :TDs => team0DefensiveTDs.to_s, :interceptions => team0Ints.to_s, :interceptionYards => team0IntYards.to_s, :kickReturnYards => team0KickRet.to_s, :puntReturnYards => team0PuntRet.to_s, :yardsAllowed => team0YdsAllowed.to_s, :teamID => awayTeamId}
+		team1Defense = {:week => week, :teamName => teamNames[1], :fumblesRecovered => team1FumRec.to_s, :pointsAllowed => finalScores[0], :sacks => team1Sacks.to_s, :TDs => team1DefensiveTDs.to_s, :interceptions => team1Ints.to_s, :interceptionYards => team1IntYards.to_s, :kickReturnYards => team1KickRet.to_s, :puntReturnYards => team1PuntRet.to_s, :yardsAllowed => team1YdsAllowed.to_s, :teamID => homeTeamId}
 
 		stats << team0Defense
 		stats << team1Defense
@@ -669,6 +682,25 @@ module ESPN
 	  def get_stats_summary(pages, week, stats)
 		pages.each { |page|
 			doc = ESPN.get 'scores', 'college-football', "game?gameId=#{page}"
+			awayTeamId = ""
+			homeTeamId = ""
+			
+			awayTeamIdRegex = /espn\.gamepackage\.awayTeamId = (\".*?\");/
+			doc.xpath("//script").each do |script_section|
+				if script_section.content =~ awayTeamIdRegex
+					awayTeamId = JSON.parse(awayTeamIdRegex.match(script_section.content)[1])
+				end
+			end
+			homeTeamIdRegex = /espn\.gamepackage\.homeTeamId = (\".*?\");/
+			doc.xpath("//script").each do |script_section|
+				if script_section.content =~ homeTeamIdRegex
+					homeTeamId = JSON.parse(homeTeamIdRegex.match(script_section.content)[1])
+				end
+			end
+			
+			#puts awayTeamId
+			#puts homeTeamId
+			
 			espn_regex = /espn\.gamepackage\.probability\.data = (\[.*?\]);/
 			doc.xpath("//script").each do |script_section|
 				#puts script_section
@@ -678,21 +710,44 @@ module ESPN
 					#plays = espn_data[1]['play']
 					
 					unless espn_data.nil?
+						safeties = 0
 						espn_data.each do |group|
-						group.each do |play|
-						if play[0].to_s.eql?("play")
-							playStats = play[1]
-							if playStats['type']['id'].to_s.eql?("59")  #59 = FG Good
-								puts playStats['text']
-							end
-						end
+							group.each do |play|
+								if play[0].to_s.eql?("play")
+									stat = {}
+									playStats = play[1]
+									if playStats['type']['id'].to_s.eql?("59")  #59 = FG Good
+										#puts playStats['text']
+									elsif playStats['type']['id'].to_s.eql?("20")  #20 = Safety
+										#puts playStats
+										safeties += 1
+										if playStats['start']['team']['id'].to_s.eql?(homeTeamId)
+											stat[:week] = week
+											stat[:teamID] = awayTeamId #flipped because the other team gets the points
+											stat[:safeties] = safeties
+											
+										elsif playStats['start']['team']['id'].to_s.eql?(awayTeamId)
+											stat[:week] = week
+											stat[:teamID] = homeTeamId
+											stat[:safeties] = safeties
+										end
+										stats << stat
+									#37 = Blocked Punt Touchdown, 67 = Passing Touchdown  68 = Rushing Touchdown, ?? = Kick Return Touchdown, ?? = Punt Return Touchdown, ?? = Blocked FG Touchdown, ?? = Fumble Recovery Touchdown
+									elsif playStats['type']['id'].to_s.eql?("37") || playStats['type']['id'].to_s.eql?("67") || playStats['type']['id'].to_s.eql?("68")
+										patString = playStats['text'][/\(.*?\)/].to_s
+										
+										if patString.downcase.include?("conversion")
+											puts patString
+										end
+									end
+								end
 						
-						end
+							end
 						
 						#if (play['type']['id'] == "59")
 						#	puts play
 						#end
-					end
+						end
 					end
 					
 					#break
@@ -701,6 +756,7 @@ module ESPN
 
 			end
 		}
+		stats
 	  end
 	  
       def winner_loser_parse(doc, date)
