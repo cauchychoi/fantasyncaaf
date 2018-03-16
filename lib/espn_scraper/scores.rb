@@ -684,6 +684,7 @@ module ESPN
 			doc = ESPN.get 'scores', 'college-football', "game?gameId=#{page}"
 			awayTeamId = ""
 			homeTeamId = ""
+			stat = {}
 			
 			awayTeamIdRegex = /espn\.gamepackage\.awayTeamId = (\".*?\");/
 			doc.xpath("//script").each do |script_section|
@@ -710,34 +711,53 @@ module ESPN
 					#plays = espn_data[1]['play']
 					
 					unless espn_data.nil?
-						safeties = 0
+						homeSafeties = 0
+						awaySafeties = 0
+						twoPointConversions = {}
 						espn_data.each do |group|
 							group.each do |play|
 								if play[0].to_s.eql?("play")
-									stat = {}
+									#stat = {}
 									playStats = play[1]
 									if playStats['type']['id'].to_s.eql?("59")  #59 = FG Good
 										#puts playStats['text']
 									elsif playStats['type']['id'].to_s.eql?("20")  #20 = Safety
 										#puts playStats
-										safeties += 1
+										#safeties += 1
 										if playStats['start']['team']['id'].to_s.eql?(homeTeamId)
-											stat[:week] = week
-											stat[:teamID] = awayTeamId #flipped because the other team gets the points
-											stat[:safeties] = safeties
-											
+											awaySafeties += 1 #flipped because the other team gets the points
 										elsif playStats['start']['team']['id'].to_s.eql?(awayTeamId)
-											stat[:week] = week
-											stat[:teamID] = homeTeamId
-											stat[:safeties] = safeties
+											homeSafeties += 1 #flipped because the other team gets the points
 										end
-										stats << stat
+										
 									#37 = Blocked Punt Touchdown, 67 = Passing Touchdown  68 = Rushing Touchdown, ?? = Kick Return Touchdown, ?? = Punt Return Touchdown, ?? = Blocked FG Touchdown, ?? = Fumble Recovery Touchdown
 									elsif playStats['type']['id'].to_s.eql?("37") || playStats['type']['id'].to_s.eql?("67") || playStats['type']['id'].to_s.eql?("68")
-										patString = playStats['text'][/\(.*?\)/].to_s
+										patString = playStats['text'][/\(.*?\)/].to_s    #get string after TD between parentheses (should be PAT text)
 										
 										if patString.downcase.include?("conversion")
-											puts patString
+											conversionTeamHash = {}
+											conversionTeamArray = []
+											conversionTeamId = playStats['start']['team']['id']
+											conversionTeamHash[:link] = "teams/roster?teamId=#{conversionTeamId}"
+											conversionTeamArray.push(conversionTeamHash)
+											conversionRoster = get_Roster(conversionTeamArray)
+											#puts "patString: " + patString.delete(' ')
+											conversionRoster.each do |player|   # iterate through player roster and look for either the player's full name or abbreviation in the PAT text
+												#conversions = 0
+												unless player[:playerName].nil?
+													playerAbbrNoWhitespace = (player[:playerName].to_s)[0] + "." + player[:playerName].to_s.split[1..-1].join(' ')
+													if patString.delete(' ').include?(player[:playerName].to_s.delete(' ')) || patString.delete(' ').include?(playerAbbrNoWhitespace)
+														#stat[:week] = week
+														#playerID = player[:playerID]
+														#stat[:twoPointConversions]
+														if !twoPointConversions.has_key?(player[:playerID].to_sym)
+															twoPointConversions[player[:playerID].to_sym] = 1
+														else
+															twoPointConversions[player[:playerID].to_sym] += 1
+														end
+													end
+												end
+											end
 										end
 									end
 								end
@@ -747,6 +767,13 @@ module ESPN
 						#if (play['type']['id'] == "59")
 						#	puts play
 						#end
+						end
+						
+						stats.push({:week => week, :teamID => awayTeamId, :safeties => awaySafeties})
+						stats.push({:week => week, :teamID => homeTeamId, :safeties => homeSafeties})
+						
+						twoPointConversions.each do |playerID, numConversions|
+							stats.push({:week => week, :playerID => playerID.to_s, :twoPointConversions => numConversions})
 						end
 					end
 					

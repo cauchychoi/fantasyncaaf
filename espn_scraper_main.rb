@@ -105,7 +105,7 @@ def calculateScores(stats)
 end
 
 weeklyStats = calculateScores(weeklyStats)
-puts weeklyStats
+#puts weeklyStats
 #dbh = DBI.connect("DBI:Mysql:localhost:id3779293_ncaafstats", "id3779293_jcl", "jeffcauchylonny")
 
 #client = Mysql2::Client.new(:host => "localhost", :username => "root")
@@ -168,7 +168,7 @@ weeklyStats.each do |statRow|
 	
 	if (statRow.has_key?(:fieldGoalAttempts))
 		tableName = "kickerStats"
-	elsif (statRow.has_key?(:passAttempts) || statRow.has_key?(:rushingAttempts) || statRow.has_key?(:receptions) || statRow.has_key?(:fumblesLost))
+	elsif (statRow.has_key?(:passAttempts) || statRow.has_key?(:rushingAttempts) || statRow.has_key?(:receptions) || statRow.has_key?(:fumblesLost) || statRow.has_key?(:twoPointConversions))
 		tableName = "offenseStats"
 	elsif (statRow.has_key?(:fumblesRecovered) || statRow.has_key?(:safeties))
 		tableName = "defenseStats"
