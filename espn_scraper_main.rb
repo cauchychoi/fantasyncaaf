@@ -9,13 +9,12 @@ require 'espn_scraper'
 require 'mysql2'
 
 puts ESPN.responding?
-#puts ESPN.get_teams_in('ncf')
-#ESPN.get_ncf_scores(2017, 11)
-weeklyStats = ESPN.get_pac12_games(2017, 12)
-#puts weeklyStats
-
 schedule = ESPN.get_schedule(2017, 9)
 #puts schedule
+
+
+
+
 
 def calculateScores(stats)
 	stats.each do |statRow|
@@ -82,8 +81,9 @@ def calculateScores(stats)
 				else
 					score -= 5
 				end
-			elsif statName.to_s.eql?("safeties")
+			elsif statName.to_s.eql?("safeties") || statName.to_s.eql?("blockedKicks")
 				score += statValue.to_f * 2
+
 			
 			elsif statName.to_s.eql?("extraPoints")
 				score += statValue.to_f * 1
@@ -104,7 +104,7 @@ def calculateScores(stats)
 	stats
 end
 
-weeklyStats = calculateScores(weeklyStats)
+
 #puts weeklyStats
 #dbh = DBI.connect("DBI:Mysql:localhost:id3779293_ncaafstats", "id3779293_jcl", "jeffcauchylonny")
 
@@ -118,9 +118,11 @@ weeklyStats = calculateScores(weeklyStats)
 client = Mysql2::Client.new(:host => "us-cdbr-iron-east-05.cleardb.net", :username => "b4078336a46f7e", :password => "10f5241c", :database => "heroku_28ca4c386152c4f")
 puts "Connection successful"
 
-client.query("truncate offensestats")
-client.query("truncate defensestats")
-client.query("truncate kickerstats")
+#client.query("truncate offensestats")
+#client.query("truncate defensestats")
+#client.query("truncate kickerstats")
+
+=begin
 
 # Populating gametimes table
 schedule.each do |game|
@@ -137,6 +139,20 @@ schedule.each do |game|
 	end
 
 end
+=end
+for i in 7..10
+client.query("delete from offensestats where week=#{i}")
+client.query("delete from defensestats where week=#{i}")
+client.query("delete from kickerstats where week=#{i}")
+
+#puts ESPN.get_teams_in('ncf')
+#ESPN.get_ncf_scores(2017, 11)
+weeklyStats = ESPN.get_pac12_games(2017, i)
+
+
+weeklyStats = calculateScores(weeklyStats)
+puts weeklyStats
+
 
 weeklyStats.each do |statRow|
 	week = statRow[:week]
@@ -170,7 +186,7 @@ weeklyStats.each do |statRow|
 		tableName = "kickerStats"
 	elsif (statRow.has_key?(:passAttempts) || statRow.has_key?(:rushingAttempts) || statRow.has_key?(:receptions) || statRow.has_key?(:fumblesLost) || statRow.has_key?(:twoPointConversions))
 		tableName = "offenseStats"
-	elsif (statRow.has_key?(:fumblesRecovered) || statRow.has_key?(:safeties))
+	elsif (statRow.has_key?(:fumblesRecovered) || statRow.has_key?(:safeties) || statRow.has_key?(:blockedKicks))
 		tableName = "defenseStats"
 	end
 	
@@ -230,15 +246,16 @@ weeklyStats.each do |statRow|
 	end
 	
 	#puts queryString
-	
+
 	if (!week.to_s.eql?("") && !playerID.to_s.eql?("") && (tableName.eql?("offenseStats") || tableName.eql?("kickerStats")))
 		client.query(queryString)
 	elsif (!week.to_s.eql?("") && !teamID.to_s.eql?("") && tableName.eql?("defenseStats"))
+		#puts queryString
 		client.query(queryString)
 	end
 end
 
-
+end
 
 #result = client.query("select * from offenseStats")
 #result.each do |row|
@@ -246,3 +263,4 @@ end
 #end
 #row = dbh.select_one("SELECT VERSION()")
 #puts "Server version: " + row[0]
+

@@ -506,149 +506,161 @@ module ESPN
 		#html = ESPN.get 'scores', 'college-football', "boxscore?gameId=400935316"
 		
 		html.xpath("//tbody/tr").each do |player|
-		  stat = {}
-		  if player['class'] != "highlight"
-		    if player.parent.parent.parent.child.child['class'] == "team-name"
-		    #if player.parent.parent.sibling.child.child['class'] == "table-caption"
-		      temp = player.parent.parent.parent.child.child.content.split.reverse.drop(1).reverse
-			  if temp[temp.size-1].to_s == "Kick" || temp[temp.size-1].to_s == "Punt"
-				temp = temp.reverse.drop(1).reverse
-			  end
-			  tempTeamName = ""
-			  temp.each_with_index do |concatenate,i|
-				if (i == temp.size - 1)
-					tempTeamName += concatenate
-				else 
-					tempTeamName += concatenate + " "
+			stat = {}
+			if player['class'] != "highlight"
+				player.parent.parent.parent.parent.traverse{|tableNode|
+					#if player.parent.parent.parent.child.child['class'] == "team-name"
+					if tableNode['class'] == "team-name"
+					#puts tableNode.content
+					#if player.parent.parent.sibling.child.child['class'] == "table-caption"
+					#temp = player.parent.parent.parent.child.child.content.split.reverse.drop(1).reverse
+						temp = tableNode.content.split.reverse.drop(1).reverse
+						if temp[temp.size-1].to_s == "Kick" || temp[temp.size-1].to_s == "Punt"
+							temp = temp.reverse.drop(1).reverse
+						end
+						tempTeamName = ""
+						temp.each_with_index do |concatenate,i|
+							if (i == temp.size - 1)
+								tempTeamName += concatenate
+							else 
+								tempTeamName += concatenate + " "
+							end
+						end
+					  
+						if !tempTeamName.eql?("")
+							stat[:teamName] = tempTeamName
+							if teamCount == 0 || (teamCount == 1 && !tempTeamName.eql?(teamNames[0]))
+								
+								teamNames[teamCount] = tempTeamName
+								teamCount += 1
+							end
+						end
+
+					#end
+					
+						player.children.each do |playerStat|
+					
+						#Defense team name and final score
+						#if playerStat['class'] == "team-name"
+						#teamNames[teamCount] = playerStat.content
+						#teamCount += 1
+						#puts teamNames
+						if playerStat['class'] == "final-score"
+							finalScores[finalScoreCount/2] = playerStat.content #not sure why /2 is needed
+							finalScoreCount += 1
+					   
+					   
+					   #Offense
+						elsif playerStat['class'] == "name"
+							stat[:playerName] = playerStat.content
+							playerLink = playerStat.child['href']
+							if playerLink =~ /id\/([^\/]+)\//
+								stat[:playerID] = $~[1]
+							end
+							playerStat.child.children.each do |findAbbr|
+								if findAbbr['class'] == "abbr"
+									stat[:playerAbbr] = findAbbr.content
+									stat[:playerName].slice! findAbbr.content
+								end
+							end
+							stat[:week] = week
+						elsif playerStat['class'] == "c-att"
+							#stat[:comp_att] = playerStat.content
+							stat[:completedPasses] = playerStat.content.partition('/').first
+							stat[:passAttempts] = playerStat.content.partition('/').last
+						elsif playerStat['class'] == "yds" && tableNode.content.split.include?("Passing")
+							stat[:passingYards] = playerStat.content
+						elsif playerStat['class'] == "yds" && tableNode.content.split.include?("Rushing")
+							stat[:rushingYards] = playerStat.content
+							if (stat[:teamName] == teamNames[0])
+								team1YdsAllowed += playerStat.content.to_i
+							elsif (stat[:teamName] == teamNames[1])
+								team0YdsAllowed += playerStat.content.to_i
+							end
+						elsif playerStat['class'] == "yds" && tableNode.content.split.include?("Receiving")
+							stat[:receivingYards] = playerStat.content
+							if (stat[:teamName] == teamNames[0])
+								team1YdsAllowed += playerStat.content.to_i
+							elsif (stat[:teamName] == teamNames[1])
+								team0YdsAllowed += playerStat.content.to_i
+							end
+						elsif playerStat['class'] == "td" && tableNode.content.split.include?("Passing")
+							stat[:passingTDs] = playerStat.content
+						elsif playerStat['class'] == "td" && tableNode.content.split.include?("Rushing")
+							stat[:rushingTDs] = playerStat.content
+						elsif playerStat['class'] == "td" && tableNode.content.split.include?("Receiving")
+							stat[:receivingTDs] = playerStat.content
+						elsif playerStat['class'] == "int" && tableNode.content.split.include?("Passing")
+							stat[:passingInterceptions] = playerStat.content
+						elsif playerStat['class'] == "car"
+							stat[:rushingAttempts] = playerStat.content
+						elsif playerStat['class'] == "rec" && tableNode.content.split.include?("Receiving")
+							stat[:receptions] = playerStat.content
+						elsif playerStat['class'] == "lost" && tableNode.content.split.include?("Fumbles")
+							stat[:fumblesLost] = playerStat.content
+							if (stat[:teamName] == teamNames[0])
+								team1FumRec += playerStat.content.to_i
+							elsif (stat[:teamName] == teamNames[1])
+								team0FumRec += playerStat.content.to_i
+							end
+					   
+						#Defense
+						#elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split[1] == "Defense"
+						elsif playerStat['class'] == "sacks" && tableNode.content.split.include?("Defense")
+							if (stat[:teamName] == teamNames[0])
+								team0Sacks += playerStat.content.to_i
+							elsif (stat[:teamName] == teamNames[1])
+								team1Sacks += playerStat.content.to_i
+							end
+						  
+						elsif playerStat['class'] == "td" && tableNode.content.split.include?("Defense")
+							if (stat[:teamName] == teamNames[0])
+								team0DefensiveTDs += playerStat.content.to_i
+							elsif (stat[:teamName] == teamNames[1])
+								team1DefensiveTDs += playerStat.content.to_i
+							end
+					   
+						elsif playerStat['class'] == "int" && tableNode.content.split.include?("Interceptions")
+							if (stat[:teamName] == teamNames[0])
+								team0Ints += playerStat.content.to_i
+							elsif (stat[:teamName] == teamNames[1])
+								team1Ints += playerStat.content.to_i
+							end
+						  
+						elsif playerStat['class'] == "yds" && tableNode.content.split.include?("Interceptions")
+							if (stat[:teamName] == teamNames[0])
+								team0IntYards += playerStat.content.to_i
+							elsif (stat[:teamName] == teamNames[1])
+								team1IntYards += playerStat.content.to_i
+							end				  
+
+						elsif playerStat['class'] == "yds" && (tableNode.content.include?("Kick Returns"))
+							if (stat[:teamName] == teamNames[0])
+								team0KickRet += playerStat.content.to_i
+							elsif (stat[:teamName] == teamNames[1])
+								team1KickRet += playerStat.content.to_i
+							end
+
+						elsif playerStat['class'] == "yds" && (tableNode.content.include?("Punt Returns"))
+							if (stat[:teamName] == teamNames[0])
+								team0PuntRet += playerStat.content.to_i
+							elsif (stat[:teamName] == teamNames[1])
+								team1PuntRet += playerStat.content.to_i
+							end
+						  
+						#Kicking
+						elsif playerStat['class'] == "fg"
+							#stat[:fieldgoals] = playerStat.content
+							stat[:fieldGoalAttempts] = playerStat.content.partition('/').last
+							stat[:fieldGoalsMade] = playerStat.content.partition('/').first
+						elsif playerStat['class'] == "xp"
+							stat[:extraPoints] = playerStat.content
+						end
+					end
 				end
-			  end
-			  stat[:teamName] = tempTeamName
-			  teamNames[teamCount] = tempTeamName
-			  teamCount += 1
-			  
-			  #puts tempTeamName
-		    end
+			}
+		end
 		  
-			player.children.each do |playerStat|
-			
-			   #Defense team name and final score
-			   #if playerStat['class'] == "team-name"
-				#teamNames[teamCount] = playerStat.content
-				#teamCount += 1
-				#puts teamNames
-			   if playerStat['class'] == "final-score"
-				finalScores[finalScoreCount] = playerStat.content
-				finalScoreCount += 1
-			   
-			   
-			   #Offense
-			   elsif playerStat['class'] == "name"
-			      stat[:playerName] = playerStat.content
-				  playerLink = playerStat.child['href']
-				  if playerLink =~ /id\/([^\/]+)\//
-					stat[:playerID] = $~[1]
-				  end
-				  playerStat.child.children.each do |findAbbr|
-					  if findAbbr['class'] == "abbr"
-						stat[:playerAbbr] = findAbbr.content
-						stat[:playerName].slice! findAbbr.content
-					  end
-				  end
-				  stat[:week] = week
-			   elsif playerStat['class'] == "c-att"
-				  #stat[:comp_att] = playerStat.content
-				  stat[:completedPasses] = playerStat.content.partition('/').first
-				  stat[:passAttempts] = playerStat.content.partition('/').last
-			   elsif playerStat['class'] == "yds" && player.parent.parent.parent.child.child.content.split.include?("Passing")
-			      stat[:passingYards] = playerStat.content
-			   elsif playerStat['class'] == "yds" && player.parent.parent.parent.child.child.content.split.include?("Rushing")
-			      stat[:rushingYards] = playerStat.content
-				  if (stat[:teamName] == teamNames[0])
-					team1YdsAllowed += playerStat.content.to_i
-				  elsif (stat[:teamName] == teamNames[1])
-					team0YdsAllowed += playerStat.content.to_i
-				  end
-			   elsif playerStat['class'] == "yds" && player.parent.parent.parent.child.child.content.split.include?("Receiving")
-				  stat[:receivingYards] = playerStat.content
-				  if (stat[:teamName] == teamNames[0])
-					team1YdsAllowed += playerStat.content.to_i
-				  elsif (stat[:teamName] == teamNames[1])
-					team0YdsAllowed += playerStat.content.to_i
-				  end
-			   elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split.include?("Passing")
-				  stat[:passingTDs] = playerStat.content
-			   elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split.include?("Rushing")
-			      stat[:rushingTDs] = playerStat.content
-			   elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split.include?("Receiving")
-			      stat[:receivingTDs] = playerStat.content
-			   elsif playerStat['class'] == "int" && player.parent.parent.parent.child.child.content.split.include?("Passing")
-				  stat[:passingInterceptions] = playerStat.content
-			   elsif playerStat['class'] == "car"
-				  stat[:rushingAttempts] = playerStat.content
-			   elsif playerStat['class'] == "rec" && player.parent.parent.parent.child.child.content.split.include?("Receiving")
-				  stat[:receptions] = playerStat.content
-			   elsif playerStat['class'] == "lost" && player.parent.parent.parent.child.child.content.split.include?("Fumbles")
-				  stat[:fumblesLost] = playerStat.content
-				  if (stat[:teamName] == teamNames[0])
-				    team1FumRec += playerStat.content.to_i
-				  elsif (stat[:teamName] == teamNames[1])
-				    team0FumRec += playerStat.content.to_i
-				  end
-			   
-			   #Defense
-			   #elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split[1] == "Defense"
-			   elsif playerStat['class'] == "sacks" && player.parent.parent.parent.child.child.content.split.include?("Defense")
-				  if (stat[:teamName] == teamNames[0])
-					team0Sacks += playerStat.content.to_i
-				  elsif (stat[:teamName] == teamNames[1])
-				    team1Sacks += playerStat.content.to_i
-				  end
-				  
-			   elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split.include?("Defense")
-				  if (stat[:teamName] == teamNames[0])
-					team0DefensiveTDs += playerStat.content.to_i
-				  elsif (stat[:teamName] == teamNames[1])
-				    team1DefensiveTDs += playerStat.content.to_i
-				  end
-			   
-			   elsif playerStat['class'] == "int" && player.parent.parent.parent.child.child.content.split.include?("Interceptions")
-				  if (stat[:teamName] == teamNames[0])
-					team0Ints += playerStat.content.to_i
-				  elsif (stat[:teamName] == teamNames[1])
-				    team1Ints += playerStat.content.to_i
-				  end
-				  
-			   elsif playerStat['class'] == "yds" && player.parent.parent.parent.child.child.content.split.include?("Interceptions")
-				  if (stat[:teamName] == teamNames[0])
-					team0IntYards += playerStat.content.to_i
-				  elsif (stat[:teamName] == teamNames[1])
-				    team1IntYards += playerStat.content.to_i
-				  end				  
-
-			   elsif playerStat['class'] == "yds" && (player.parent.parent.parent.child.child.content.include?("Kick Returns"))
-				  if (stat[:teamName] == teamNames[0])
-					team0KickRet += playerStat.content.to_i
-				  elsif (stat[:teamName] == teamNames[1])
-				    team1KickRet += playerStat.content.to_i
-				  end
-
-			   elsif playerStat['class'] == "yds" && (player.parent.parent.parent.child.child.content.include?("Punt Returns"))
-				  if (stat[:teamName] == teamNames[0])
-					team0PuntRet += playerStat.content.to_i
-				  elsif (stat[:teamName] == teamNames[1])
-				    team1PuntRet += playerStat.content.to_i
-				  end
-				  
-			   #Kicking
-			   elsif playerStat['class'] == "fg"
-			      #stat[:fieldgoals] = playerStat.content
-				  stat[:fieldGoalAttempts] = playerStat.content.partition('/').last
-				  stat[:fieldGoalsMade] = playerStat.content.partition('/').first
-			   elsif playerStat['class'] == "xp"
-			      stat[:extraPoints] = playerStat.content
-			   end
-			end
-		  end
 
 		  # IF KICKER, GO TO KICKER PLAYER PAGE AND GET STATS
 		  if stat.has_key?(:fieldGoalAttempts)
@@ -713,12 +725,17 @@ module ESPN
 					unless espn_data.nil?
 						homeSafeties = 0
 						awaySafeties = 0
+						homeBlockedKicks = 0
+						awayBlockedKicks = 0
 						twoPointConversions = {}
 						espn_data.each do |group|
 							group.each do |play|
 								if play[0].to_s.eql?("play")
+									#puts play
 									#stat = {}
 									playStats = play[1]
+									#puts playStats
+									unless playStats['type'].nil?
 									if playStats['type']['id'].to_s.eql?("59")  #59 = FG Good
 										#puts playStats['text']
 									elsif playStats['type']['id'].to_s.eql?("20")  #20 = Safety
@@ -730,8 +747,8 @@ module ESPN
 											homeSafeties += 1 #flipped because the other team gets the points
 										end
 										
-									#37 = Blocked Punt Touchdown, 67 = Passing Touchdown  68 = Rushing Touchdown, ?? = Kick Return Touchdown, ?? = Punt Return Touchdown, ?? = Blocked FG Touchdown, ?? = Fumble Recovery Touchdown
-									elsif playStats['type']['id'].to_s.eql?("37") || playStats['type']['id'].to_s.eql?("67") || playStats['type']['id'].to_s.eql?("68")
+									#37 = Blocked Punt Touchdown, 67 = Passing Touchdown  68 = Rushing Touchdown, 32 = Kickoff Return TD, 52 = Punt, 34 = Punt Ret TD, 38 = Blocked FG TD, 39 = Fumble Ret TD, 36 = Interception Return TD
+									elsif playStats['type']['id'].to_s.eql?("37") || playStats['type']['id'].to_s.eql?("67") || playStats['type']['id'].to_s.eql?("68") || playStats['type']['id'].to_s.eql?("32") || playStats['type']['id'].to_s.eql?("52") || playStats['type']['id'].to_s.eql?("34") || playStats['type']['id'].to_s.eql?("39") || playStats['type']['id'].to_s.eql?("39") || playStats['type']['id'].to_s.eql?("36")
 										patString = playStats['text'][/\(.*?\)/].to_s    #get string after TD between parentheses (should be PAT text)
 										
 										if patString.downcase.include?("conversion")
@@ -758,15 +775,27 @@ module ESPN
 													end
 												end
 											end
+										elsif patString.downcase.include?("block")
+											if playStats['start']['team']['id'].to_s.eql?(homeTeamId)
+												awayBlockedKicks += 1 #flipped because the other team gets the points
+											elsif playStats['start']['team']['id'].to_s.eql?(awayTeamId)
+												homeBlockedKicks += 1 #flipped because the other team gets the points
+											end
+										end
+									# 17 = Blocked Punt, 18 = Blocked Field Goal, 37 = Blocked Punt TD, 38 = Blocked FG TD, TODO: no blocked PAT ID
+									elsif playStats['type']['id'].to_s.eql?("17") || playStats['type']['id'].to_s.eql?("18") || playStats['type']['id'].to_s.eql?("37") || playStats['type']['id'].to_s.eql?("38")
+										if playStats['start']['team']['id'].to_s.eql?(homeTeamId)
+											awayBlockedKicks += 1 #flipped because the other team gets the points
+										elsif playStats['start']['team']['id'].to_s.eql?(awayTeamId)
+											homeBlockedKicks += 1 #flipped because the other team gets the points
 										end
 									end
+									#end
 								end
-						
 							end
 						
-						#if (play['type']['id'] == "59")
-						#	puts play
-						#end
+
+						end ### unless end
 						end
 						
 						stats.push({:week => week, :teamID => awayTeamId, :safeties => awaySafeties})
@@ -775,6 +804,9 @@ module ESPN
 						twoPointConversions.each do |playerID, numConversions|
 							stats.push({:week => week, :playerID => playerID.to_s, :twoPointConversions => numConversions})
 						end
+						
+						stats.push({:week => week, :teamID => awayTeamId, :blockedKicks => awayBlockedKicks})
+						stats.push({:week => week, :teamID => homeTeamId, :blockedKicks => homeBlockedKicks})
 					end
 					
 					#break
