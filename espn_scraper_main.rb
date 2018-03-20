@@ -13,9 +13,6 @@ schedule = ESPN.get_schedule(2017, 9)
 #puts schedule
 
 
-
-
-
 def calculateScores(stats)
 	stats.each do |statRow|
 		#puts statRow
@@ -118,13 +115,11 @@ end
 client = Mysql2::Client.new(:host => "us-cdbr-iron-east-05.cleardb.net", :username => "b4078336a46f7e", :password => "10f5241c", :database => "heroku_28ca4c386152c4f")
 puts "Connection successful"
 
-#client.query("truncate offensestats")
-#client.query("truncate defensestats")
-#client.query("truncate kickerstats")
 
-=begin
 
 # Populating gametimes table
+client.query("truncate gametimes")
+client.query("set session time_zone = \"+00:00\"")
 schedule.each do |game|
 	game.each do |row|
 		queryString = "INSERT INTO gametimes (week, team, gameTime) VALUES("
@@ -139,17 +134,14 @@ schedule.each do |game|
 	end
 
 end
-=end
-for i in 7..10
+
+=begin
+for i in 12..13  # week; TODO figure out how to just do game
 client.query("delete from offensestats where week=#{i}")
 client.query("delete from defensestats where week=#{i}")
 client.query("delete from kickerstats where week=#{i}")
 
-#puts ESPN.get_teams_in('ncf')
-#ESPN.get_ncf_scores(2017, 11)
 weeklyStats = ESPN.get_pac12_games(2017, i)
-
-
 weeklyStats = calculateScores(weeklyStats)
 puts weeklyStats
 
@@ -186,7 +178,7 @@ weeklyStats.each do |statRow|
 		tableName = "kickerStats"
 	elsif (statRow.has_key?(:passAttempts) || statRow.has_key?(:rushingAttempts) || statRow.has_key?(:receptions) || statRow.has_key?(:fumblesLost) || statRow.has_key?(:twoPointConversions))
 		tableName = "offenseStats"
-	elsif (statRow.has_key?(:fumblesRecovered) || statRow.has_key?(:safeties) || statRow.has_key?(:blockedKicks))
+	elsif (statRow.has_key?(:fumblesRecovered) || statRow.has_key?(:safeties) || statRow.has_key?(:blockedKicks) || statRow.has_key?(:returnsPAT))
 		tableName = "defenseStats"
 	end
 	
@@ -263,4 +255,4 @@ end
 #end
 #row = dbh.select_one("SELECT VERSION()")
 #puts "Server version: " + row[0]
-
+=end

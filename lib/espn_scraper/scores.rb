@@ -364,7 +364,8 @@ module ESPN
 		  end
 		  
 		  
-          dateTime = DateTime.parse(competition['startDate']).strftime('%Y-%m-%d %H:%M:%S') #formatting for MySQL
+          dateTime = DateTime.parse(competition['startDate'])
+		  dateTime = dateTime.strftime('%Y-%m-%d %H:%M:%S') #formatting for MySQL
 		  
 		  teamArray.each do |teamName|
 			gameSchedule[:week] = week
@@ -727,6 +728,8 @@ module ESPN
 						awaySafeties = 0
 						homeBlockedKicks = 0
 						awayBlockedKicks = 0
+						home2ptReturnPAT = 0
+						away2ptReturnPAT = 0
 						twoPointConversions = {}
 						espn_data.each do |group|
 							group.each do |play|
@@ -736,66 +739,71 @@ module ESPN
 									playStats = play[1]
 									#puts playStats
 									unless playStats['type'].nil?
-									if playStats['type']['id'].to_s.eql?("59")  #59 = FG Good
-										#puts playStats['text']
-									elsif playStats['type']['id'].to_s.eql?("20")  #20 = Safety
-										#puts playStats
-										#safeties += 1
-										if playStats['start']['team']['id'].to_s.eql?(homeTeamId)
-											awaySafeties += 1 #flipped because the other team gets the points
-										elsif playStats['start']['team']['id'].to_s.eql?(awayTeamId)
-											homeSafeties += 1 #flipped because the other team gets the points
-										end
-										
-									#37 = Blocked Punt Touchdown, 67 = Passing Touchdown  68 = Rushing Touchdown, 32 = Kickoff Return TD, 52 = Punt, 34 = Punt Ret TD, 38 = Blocked FG TD, 39 = Fumble Ret TD, 36 = Interception Return TD
-									elsif playStats['type']['id'].to_s.eql?("37") || playStats['type']['id'].to_s.eql?("67") || playStats['type']['id'].to_s.eql?("68") || playStats['type']['id'].to_s.eql?("32") || playStats['type']['id'].to_s.eql?("52") || playStats['type']['id'].to_s.eql?("34") || playStats['type']['id'].to_s.eql?("39") || playStats['type']['id'].to_s.eql?("39") || playStats['type']['id'].to_s.eql?("36")
-										patString = playStats['text'][/\(.*?\)/].to_s    #get string after TD between parentheses (should be PAT text)
-										
-										if patString.downcase.include?("conversion")
-											conversionTeamHash = {}
-											conversionTeamArray = []
-											conversionTeamId = playStats['start']['team']['id']
-											conversionTeamHash[:link] = "teams/roster?teamId=#{conversionTeamId}"
-											conversionTeamArray.push(conversionTeamHash)
-											conversionRoster = get_Roster(conversionTeamArray)
-											#puts "patString: " + patString.delete(' ')
-											conversionRoster.each do |player|   # iterate through player roster and look for either the player's full name or abbreviation in the PAT text
-												#conversions = 0
-												unless player[:playerName].nil?
-													playerAbbrNoWhitespace = (player[:playerName].to_s)[0] + "." + player[:playerName].to_s.split[1..-1].join(' ')
-													if patString.delete(' ').include?(player[:playerName].to_s.delete(' ')) || patString.delete(' ').include?(playerAbbrNoWhitespace)
-														#stat[:week] = week
-														#playerID = player[:playerID]
-														#stat[:twoPointConversions]
-														if !twoPointConversions.has_key?(player[:playerID].to_sym)
-															twoPointConversions[player[:playerID].to_sym] = 1
-														else
-															twoPointConversions[player[:playerID].to_sym] += 1
+										if playStats['type']['id'].to_s.eql?("59")  #59 = FG Good
+											#puts playStats['text']
+										elsif playStats['type']['id'].to_s.eql?("20")  #20 = Safety
+											#puts playStats
+											#safeties += 1
+											if playStats['start']['team']['id'].to_s.eql?(homeTeamId)
+												awaySafeties += 1 #flipped because the other team gets the points
+											elsif playStats['start']['team']['id'].to_s.eql?(awayTeamId)
+												homeSafeties += 1 #flipped because the other team gets the points
+											end
+											
+										#37 = Blocked Punt Touchdown, 67 = Passing Touchdown  68 = Rushing Touchdown, 32 = Kickoff Return TD, 52 = Punt, 34 = Punt Ret TD, 38 = Blocked FG TD, 39 = Fumble Ret TD, 36 = Interception Return TD
+										elsif playStats['type']['id'].to_s.eql?("37") || playStats['type']['id'].to_s.eql?("67") || playStats['type']['id'].to_s.eql?("68") || playStats['type']['id'].to_s.eql?("32") || playStats['type']['id'].to_s.eql?("52") || playStats['type']['id'].to_s.eql?("34") || playStats['type']['id'].to_s.eql?("39") || playStats['type']['id'].to_s.eql?("39") || playStats['type']['id'].to_s.eql?("36")
+											patString = playStats['text'][/\(.*?\)/].to_s    #get string after TD between parentheses (should be PAT text)
+											
+											if patString.downcase.include?("conversion")
+												conversionTeamHash = {}
+												conversionTeamArray = []
+												conversionTeamId = playStats['start']['team']['id']
+												conversionTeamHash[:link] = "teams/roster?teamId=#{conversionTeamId}"
+												conversionTeamArray.push(conversionTeamHash)
+												conversionRoster = get_Roster(conversionTeamArray)
+												#puts "patString: " + patString.delete(' ')
+												conversionRoster.each do |player|   # iterate through player roster and look for either the player's full name or abbreviation in the PAT text
+													#conversions = 0
+													unless player[:playerName].nil?
+														playerAbbrNoWhitespace = (player[:playerName].to_s)[0] + "." + player[:playerName].to_s.split[1..-1].join(' ')
+														if patString.delete(' ').include?(player[:playerName].to_s.delete(' ')) || patString.delete(' ').include?(playerAbbrNoWhitespace)
+															#stat[:week] = week
+															#playerID = player[:playerID]
+															#stat[:twoPointConversions]
+															if !twoPointConversions.has_key?(player[:playerID].to_sym)
+																twoPointConversions[player[:playerID].to_sym] = 1
+															else
+																twoPointConversions[player[:playerID].to_sym] += 1
+															end
 														end
 													end
 												end
+											elsif patString.downcase.include?("block")  # blocked PAT
+												if playStats['start']['team']['id'].to_s.eql?(homeTeamId)
+													awayBlockedKicks += 1 #flipped because the other team gets the points
+												elsif playStats['start']['team']['id'].to_s.eql?(awayTeamId)
+													homeBlockedKicks += 1 #flipped because the other team gets the points
+												end
 											end
-										elsif patString.downcase.include?("block")
+										# 17 = Blocked Punt, 18 = Blocked Field Goal, 37 = Blocked Punt TD, 38 = Blocked FG TD, See above for Blocked PAT
+										elsif playStats['type']['id'].to_s.eql?("17") || playStats['type']['id'].to_s.eql?("18") || playStats['type']['id'].to_s.eql?("37") || playStats['type']['id'].to_s.eql?("38")
 											if playStats['start']['team']['id'].to_s.eql?(homeTeamId)
 												awayBlockedKicks += 1 #flipped because the other team gets the points
 											elsif playStats['start']['team']['id'].to_s.eql?(awayTeamId)
 												homeBlockedKicks += 1 #flipped because the other team gets the points
 											end
-										end
-									# 17 = Blocked Punt, 18 = Blocked Field Goal, 37 = Blocked Punt TD, 38 = Blocked FG TD, TODO: no blocked PAT ID
-									elsif playStats['type']['id'].to_s.eql?("17") || playStats['type']['id'].to_s.eql?("18") || playStats['type']['id'].to_s.eql?("37") || playStats['type']['id'].to_s.eql?("38")
-										if playStats['start']['team']['id'].to_s.eql?(homeTeamId)
-											awayBlockedKicks += 1 #flipped because the other team gets the points
-										elsif playStats['start']['team']['id'].to_s.eql?(awayTeamId)
-											homeBlockedKicks += 1 #flipped because the other team gets the points
+										elsif playStats['type']['id'].to_s.eql?("57")  #57 = defensive 2pt
+											if playStats['start']['team']['id'].to_s.eql?(homeTeamId)
+												away2ptReturnPAT += 1 #flipped because the other team gets the points
+											elsif playStats['start']['team']['id'].to_s.eql?(awayTeamId)
+												home2ptReturnPAT += 1 #flipped because the other team gets the points
+											end
 										end
 									end
-									#end
-								end
-							end
-						
+								end   # unless playStats.nil?
+							
 
-						end ### unless end
+							end 
 						end
 						
 						stats.push({:week => week, :teamID => awayTeamId, :safeties => awaySafeties})
@@ -807,7 +815,10 @@ module ESPN
 						
 						stats.push({:week => week, :teamID => awayTeamId, :blockedKicks => awayBlockedKicks})
 						stats.push({:week => week, :teamID => homeTeamId, :blockedKicks => homeBlockedKicks})
-					end
+						
+						stats.push({:week => week, :teamID => awayTeamId, :returnsPAT => away2ptReturnPAT})
+						stats.push({:week => week, :teamID => homeTeamId, :returnsPAT => home2ptReturnPAT})
+					end  ### unless espn_data.nil?
 					
 					#break
 				end
