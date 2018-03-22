@@ -127,15 +127,15 @@ client = Mysql2::Client.new(:host => "us-cdbr-iron-east-05.cleardb.net", :userna
 puts "Connection successful"
 
 
-for i in 12..13  # week
+#for i in 12..13  # week
 #client.query("delete from offensestats where week=#{i}")
 #client.query("delete from defensestats where week=#{i}")
 #client.query("delete from kickerstats where week=#{i}")
 
-#weeklyStats = ESPN.get_pac12_game(2017, ARGV[0], Array(ARGV[1]))
-weeklyStats = ESPN.get_pac12_games(2017, i)  # TODO: parameters should be year, week, gameID
+weeklyStats = ESPN.get_pac12_game(2017, ARGV[0], Array(ARGV[1]))
+#weeklyStats = ESPN.get_pac12_games(2017, i)  # TODO: parameters should be year, week, gameID
 fantasyPoints = calculateScores(weeklyStats)
-puts weeklyStats
+#puts weeklyStats
 
 weeklyStats.each do |statRow|
 	week = statRow[:week]
@@ -268,7 +268,7 @@ defenseQuery += " ON DUPLICATE KEY UPDATE week=VALUES(week), teamID=VALUES(teamI
 client.query(offenseQuery)
 client.query(defenseQuery)
 
-end
+#end
 
 #result = client.query("select * from offenseStats")
 #result.each do |row|
