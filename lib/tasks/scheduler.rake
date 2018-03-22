@@ -10,7 +10,7 @@ task :update_scores do
 		utcGameTime = Time.parse(game['gametime'].strftime('%Y-%m-%d %H:%M:%S UTC'))
 		if (utcGameTime..utcGameTime+(4.5*60*60)).cover?(Time.now.utc)
 			puts "Updating scores from ESPN..."
-			ruby "espn_scraper_main.rb"
+			ruby "espn_scraper_main.rb #{game['week']} #{game['gameID']}" 
 		end
 	end
 	
@@ -19,8 +19,4 @@ task :update_scores do
 	#	puts "YAY"
 	#end
 	
-end
-
-task :testrake do
-	puts "TEST"
 end

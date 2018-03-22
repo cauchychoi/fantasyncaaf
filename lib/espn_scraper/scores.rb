@@ -124,6 +124,14 @@ module ESPN
 	  pac12Weekly
 	end
 	
+	def get_pac12_game(year, week, gameID)
+	  markup = Scores.markup_from_year_week_conf('college-football', year, week, 9)
+	  #gameIDs = Scores.get_gameIDs(markup)
+	  gameStats = Scores.get_stats_boxscore(gameID, week)
+	  gameStats = Scores.get_stats_summary(gameID, week, gameStats)
+	  gameStats
+	end
+	
 	def get_schedule(year, conf)
 		seasonSchedule = []
 		for week in 1..13
@@ -354,6 +362,12 @@ module ESPN
         games.each do |game|
 		  gameSchedule = {}
 		  teamArray = []
+		  
+		  # gameID
+		  uidLong = game['uid']
+		  uidShort = uidLong[-9..-1]
+		  gameSchedule[:gameID] = uidShort
+		  
           competition = game['competitions'].first
 		  teams = competition['competitors']
 		  teams.each do |team|
@@ -655,7 +669,7 @@ module ESPN
 							stat[:fieldGoalAttempts] = playerStat.content.partition('/').last
 							stat[:fieldGoalsMade] = playerStat.content.partition('/').first
 						elsif playerStat['class'] == "xp"
-							stat[:extraPoints] = playerStat.content
+							stat[:extraPoints] = playerStat.content.partition('/').first
 						end
 					end
 				end
@@ -672,13 +686,13 @@ module ESPN
 		  end
 		  
 		  
-		  if stat != {}
+		  if stat != {} && (stat.has_key?(:completedPasses) || stat.has_key?(:rushingAttempts) || stat.has_key?(:receptions) || stat.has_key?(:fieldGoalAttempts) || stat.has_key?(:fumblesLost) || stat.has_key?(:twoPointConversions))
 			stats << stat
 		  end
 		end
 		
-		team0Defense = {:week => week, :teamName => teamNames[0], :fumblesRecovered => team0FumRec.to_s, :pointsAllowed => finalScores[1], :sacks => team0Sacks.to_s, :TDs => team0DefensiveTDs.to_s, :interceptions => team0Ints.to_s, :interceptionYards => team0IntYards.to_s, :kickReturnYards => team0KickRet.to_s, :puntReturnYards => team0PuntRet.to_s, :yardsAllowed => team0YdsAllowed.to_s, :teamID => awayTeamId}
-		team1Defense = {:week => week, :teamName => teamNames[1], :fumblesRecovered => team1FumRec.to_s, :pointsAllowed => finalScores[0], :sacks => team1Sacks.to_s, :TDs => team1DefensiveTDs.to_s, :interceptions => team1Ints.to_s, :interceptionYards => team1IntYards.to_s, :kickReturnYards => team1KickRet.to_s, :puntReturnYards => team1PuntRet.to_s, :yardsAllowed => team1YdsAllowed.to_s, :teamID => homeTeamId}
+		team0Defense = {:week => week, :teamID => awayTeamId, :teamName => teamNames[0], :pointsAllowed => finalScores[1], :yardsAllowed => team0YdsAllowed.to_s, :fumblesRecovered => team0FumRec.to_s, :sacks => team0Sacks.to_s, :TDs => team0DefensiveTDs.to_s, :interceptions => team0Ints.to_s, :interceptionYards => team0IntYards.to_s, :kickReturnYards => team0KickRet.to_s, :puntReturnYards => team0PuntRet.to_s}
+		team1Defense = {:week => week, :teamID => homeTeamId, :teamName => teamNames[1], :pointsAllowed => finalScores[0], :yardsAllowed => team1YdsAllowed.to_s, :fumblesRecovered => team1FumRec.to_s, :sacks => team1Sacks.to_s, :TDs => team1DefensiveTDs.to_s, :interceptions => team1Ints.to_s, :interceptionYards => team1IntYards.to_s, :kickReturnYards => team1KickRet.to_s, :puntReturnYards => team1PuntRet.to_s}
 
 		stats << team0Defense
 		stats << team1Defense

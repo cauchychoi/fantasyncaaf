@@ -9,11 +9,11 @@ require 'espn_scraper'
 require 'mysql2'
 
 puts ESPN.responding?
-schedule = ESPN.get_schedule(2017, 9)
-#puts schedule
 
 
 def calculateScores(stats)
+	scores = []
+
 	stats.each do |statRow|
 		#puts statRow
 		score = 0
@@ -96,14 +96,25 @@ def calculateScores(stats)
 				score += statValue.to_f * 5	
 			end
 		end
-		statRow[:fantasyPoints] = score
+		#statRow[:fantasyPoints] = score
+		if statRow.has_key?(:playerID)
+			if !scores.find{|player| player[:week] == statRow[:week] and player[:playerID] == statRow[:playerID]}.nil?  # if scores already has week and playerID
+				scores.find{|player| player[:week] == statRow[:week] and player[:playerID] == statRow[:playerID]}[:fantasyPoints] += score
+			else
+				scores.push({:week => statRow[:week], :playerID => statRow[:playerID], :fantasyPoints => score})
+			end
+		elsif statRow.has_key?(:teamID)
+			if !scores.find{|player| player[:week] == statRow[:week] and player[:teamID] == statRow[:teamID]}.nil?  # if scores already has week and teamID
+				scores.find{|player| player[:week] == statRow[:week] and player[:teamID] == statRow[:teamID]}[:fantasyPoints] += score
+			else
+				scores.push({:week => statRow[:week], :teamID => statRow[:teamID], :fantasyPoints => score})
+			end
+
+		end
 	end
-	stats
+	scores
 end
 
-
-#puts weeklyStats
-#dbh = DBI.connect("DBI:Mysql:localhost:id3779293_ncaafstats", "id3779293_jcl", "jeffcauchylonny")
 
 #client = Mysql2::Client.new(:host => "localhost", :username => "root")
 #mysql://b4078336a46f7e:10f5241c@us-cdbr-iron-east-05.cleardb.net/heroku_28ca4c386152c4f?reconnect=true
@@ -116,35 +127,15 @@ client = Mysql2::Client.new(:host => "us-cdbr-iron-east-05.cleardb.net", :userna
 puts "Connection successful"
 
 
+for i in 12..13  # week
+#client.query("delete from offensestats where week=#{i}")
+#client.query("delete from defensestats where week=#{i}")
+#client.query("delete from kickerstats where week=#{i}")
 
-# Populating gametimes table
-client.query("truncate gametimes")
-client.query("set session time_zone = \"+00:00\"")
-schedule.each do |game|
-	game.each do |row|
-		queryString = "INSERT INTO gametimes (week, team, gameTime) VALUES("
-		row.each_with_index do |(key,value),i|
-			if i == row.size - 1
-				queryString += "'" + value.to_s + "') ON DUPLICATE KEY UPDATE week=VALUES(week), team=VALUES(team), gameTime=VALUES(gameTime)"
-			else
-				queryString += "'" + value.to_s + "', "
-			end
-		end
-		client.query(queryString)
-	end
-
-end
-
-=begin
-for i in 12..13  # week; TODO figure out how to just do game
-client.query("delete from offensestats where week=#{i}")
-client.query("delete from defensestats where week=#{i}")
-client.query("delete from kickerstats where week=#{i}")
-
-weeklyStats = ESPN.get_pac12_games(2017, i)
-weeklyStats = calculateScores(weeklyStats)
+#weeklyStats = ESPN.get_pac12_game(2017, ARGV[0], Array(ARGV[1]))
+weeklyStats = ESPN.get_pac12_games(2017, i)  # TODO: parameters should be year, week, gameID
+fantasyPoints = calculateScores(weeklyStats)
 puts weeklyStats
-
 
 weeklyStats.each do |statRow|
 	week = statRow[:week]
@@ -174,9 +165,9 @@ weeklyStats.each do |statRow|
 		#end
 	end
 	
-	if (statRow.has_key?(:fieldGoalAttempts))
-		tableName = "kickerStats"
-	elsif (statRow.has_key?(:passAttempts) || statRow.has_key?(:rushingAttempts) || statRow.has_key?(:receptions) || statRow.has_key?(:fumblesLost) || statRow.has_key?(:twoPointConversions))
+	#if (statRow.has_key?(:fieldGoalAttempts))
+	#	tableName = "kickerStats"
+	if (statRow.has_key?(:passAttempts) || statRow.has_key?(:rushingAttempts) || statRow.has_key?(:receptions) || statRow.has_key?(:fumblesLost) || statRow.has_key?(:twoPointConversions) || statRow.has_key?(:fieldGoalAttempts))
 		tableName = "offenseStats"
 	elsif (statRow.has_key?(:fumblesRecovered) || statRow.has_key?(:safeties) || statRow.has_key?(:blockedKicks) || statRow.has_key?(:returnsPAT))
 		tableName = "defenseStats"
@@ -203,35 +194,36 @@ weeklyStats.each do |statRow|
 		if (!insert.to_s.eql?("week"))
 			if (tableName.eql?("defenseStats"))
 				if (!insert.to_s.eql?("teamID"))
-					if insert.to_s.eql?("fantasyPoints")
-						if index == statNames.size - 1
-							queryString += insert.to_s + "=" + insert.to_s + "+VALUES(" + insert.to_s + ")"
-						else
-							queryString += insert.to_s + "=" + insert.to_s + "+VALUES(" + insert.to_s + "), "
-						end
-					else
+					#if insert.to_s.eql?("fantasyPoints")
+					#	if index == statNames.size - 1
+					#		queryString += insert.to_s + "=" + insert.to_s + "+VALUES(" + insert.to_s + ")"
+					#	else
+					#		queryString += insert.to_s + "=" + insert.to_s + "+VALUES(" + insert.to_s + "), "
+					#	end
+					#else
+					
 						if index == statNames.size - 1
 							queryString += insert.to_s + "=VALUES(" + insert.to_s + ")"
 						else
 							queryString += insert.to_s + "=VALUES(" + insert.to_s + "), "
 						end
-					end
+					#end
 				end
 			else
 				if (!insert.to_s.eql?("playerID"))
-					if insert.to_s.eql?("fantasyPoints")
-						if index == statNames.size - 1
-							queryString += insert.to_s + "=" + insert.to_s + "+VALUES(" + insert.to_s + ")"
-						else
-							queryString += insert.to_s + "=" + insert.to_s + "+VALUES(" + insert.to_s + "), "
-						end
-					else
+					#if insert.to_s.eql?("fantasyPoints")
+					#	if index == statNames.size - 1
+					#		queryString += insert.to_s + "=" + insert.to_s + "+VALUES(" + insert.to_s + ")"
+					#	else
+					#		queryString += insert.to_s + "=" + insert.to_s + "+VALUES(" + insert.to_s + "), "
+					#	end
+					#else
 						if index == statNames.size - 1
 							queryString += insert.to_s + "=VALUES(" + insert.to_s + ")"
 						else
 							queryString += insert.to_s + "=VALUES(" + insert.to_s + "), "
 						end
-					end
+					#end
 				end
 			end
 		end
@@ -239,13 +231,42 @@ weeklyStats.each do |statRow|
 	
 	#puts queryString
 
-	if (!week.to_s.eql?("") && !playerID.to_s.eql?("") && (tableName.eql?("offenseStats") || tableName.eql?("kickerStats")))
+	if (!week.to_s.eql?("") && !playerID.to_s.eql?("") && tableName.eql?("offenseStats"))
+		#puts queryString
 		client.query(queryString)
 	elsif (!week.to_s.eql?("") && !teamID.to_s.eql?("") && tableName.eql?("defenseStats"))
 		#puts queryString
 		client.query(queryString)
 	end
 end
+
+#Insert fantasy points - assumes order is week, playerID/teamID, fantasyPoints
+offenseQuery = "INSERT INTO offensestats (week, playerID, fantasyPoints) VALUES"
+defenseQuery = "INSERT INTO defensestats (week, teamID, fantasyPoints) VALUES"
+offenseFirst = true
+defenseFirst = true
+fantasyPoints.each do |player|
+	if player.has_key?(:playerID)
+		if offenseFirst
+			offenseQuery += "(" + player[:week].to_s + "," + player[:playerID].to_s + "," + '%.2f' % player[:fantasyPoints] + ")"
+			offenseFirst = false
+		else
+			offenseQuery += ",(" + player[:week].to_s + "," + player[:playerID].to_s + "," + '%.2f' % player[:fantasyPoints] + ")"
+		end
+	elsif player.has_key?(:teamID)
+		if defenseFirst
+			defenseQuery += "(" + player[:week].to_s + "," + player[:teamID].to_s + "," + '%.2f' % player[:fantasyPoints] + ")"
+			defenseFirst = false
+		else
+			defenseQuery += ",(" + player[:week].to_s + "," + player[:teamID].to_s + "," + '%.2f' % player[:fantasyPoints] + ")"
+		end
+	end
+end
+offenseQuery += " ON DUPLICATE KEY UPDATE week=VALUES(week), playerID=VALUES(playerID), fantasyPoints=VALUES(fantasyPoints)"
+defenseQuery += " ON DUPLICATE KEY UPDATE week=VALUES(week), teamID=VALUES(teamID), fantasyPoints=VALUES(fantasyPoints)"
+
+client.query(offenseQuery)
+client.query(defenseQuery)
 
 end
 
@@ -255,4 +276,4 @@ end
 #end
 #row = dbh.select_one("SELECT VERSION()")
 #puts "Server version: " + row[0]
-=end
+
