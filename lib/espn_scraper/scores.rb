@@ -360,39 +360,29 @@ module ESPN
           end
         end
         games.each do |game|
-		  gameSchedule = {}
-		  teamArray = []
 		  
 		  # gameID
 		  uidLong = game['uid']
 		  uidShort = uidLong[-9..-1]
-		  gameSchedule[:gameID] = uidShort
 		  
           competition = game['competitions'].first
+		  
+		  dateTime = DateTime.parse(competition['startDate'])
+		  dateTime = dateTime.strftime('%Y-%m-%d %H:%M:%S') #formatting for MySQL
+		  
 		  teams = competition['competitors']
 		  teams.each do |team|
 			displayName = team['team']['displayName']
 			displayName.slice!(team['team']['shortDisplayName'])  #isolate school name. e.g. displayName = USC Trojans, shortDisplayName = Trojans
 			displayName = displayName.strip
-			teamArray.push(displayName)
+			weekSchedule.push({:gameID => uidShort, :week => week, :team => displayName, :gametime => dateTime})
 		  end
-		  
-		  
-          dateTime = DateTime.parse(competition['startDate'])
-		  dateTime = dateTime.strftime('%Y-%m-%d %H:%M:%S') #formatting for MySQL
-		  
-		  teamArray.each do |teamName|
-			gameSchedule[:week] = week
-			gameSchedule[:team] = teamName
-
-			gameSchedule[:gametime] = dateTime
-		  end
-		  
+		 
           #date = date.new_offset('-08:00') #convert from GMT to PST
           
-		  weekSchedule << gameSchedule
+		  
 		end
-		
+		#puts weekSchedule
 		weekSchedule  #returns list of game IDs
         #scores
       end
