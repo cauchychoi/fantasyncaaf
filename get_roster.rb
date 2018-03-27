@@ -28,6 +28,7 @@ roster.each do |player|
 	playerName = player[:playerName]
 	position = player[:position]
 	playerID = player[:playerID]
+	teamID = player[:teamID]
 	if (playerName.is_a? String)
 		playerName = playerName.gsub("'", %q(\\\'))
 	end
@@ -38,7 +39,7 @@ roster.each do |player|
 	if (!teamName.to_s.eql?("") && !playerName.to_s.eql?("") && !position.to_s.eql?("") && !playerID.to_s.eql?("") && !position.to_s.eql?("DB") && !position.to_s.eql?("LB") && !position.to_s.eql?("G") && !position.to_s.eql?("LS") && !position.to_s.eql?("OL") && !position.to_s.eql?("DT") && !position.to_s.eql?("S") && !position.to_s.eql?("CB") && !position.to_s.eql?("P") && !position.to_s.eql?("C") && !position.to_s.eql?("DL") && !position.to_s.eql?("DE") && !position.to_s.eql?("OT") && !position.to_s.eql?("NT"))
 		playerAbbr = playerName[0] + ".  " + playerName.split[1..-1].join(' ')
 		
-		client.query("INSERT INTO collegeTeamRoster (team, PlayerName, PlayerAbbr, position, playerID) VALUES ('#{teamName}', '#{playerName}', '#{playerAbbr}', '#{position}', '#{playerID}') ON DUPLICATE KEY UPDATE team=VALUES(team), PlayerName=VALUES(PlayerName), PlayerAbbr=VALUES(PlayerAbbr), position=VALUES(position)")
+		client.query("INSERT INTO collegeTeamRoster (teamID, team, playerID, PlayerName, PlayerAbbr, position) VALUES ('#{teamID}', '#{teamName}', '#{playerID}', '#{playerName}', '#{playerAbbr}', '#{position}') ON DUPLICATE KEY UPDATE team=VALUES(team), PlayerName=VALUES(PlayerName), PlayerAbbr=VALUES(PlayerAbbr), position=VALUES(position)")
 		#client.query("INSERT INTO collegeTeamRoster (team, PlayerName, position, playerID) VALUES ('#{teamName}', '#{playerName}', '#{position}', '#{playerID}') ON DUPLICATE KEY IGNORE")
 		#client.query("INSERT INTO collegeTeamRoster (team, PlayerName, position, playerID) VALUES (#{player[:teamName]}, #{player[:playerName]}, #{player[:position]}, #{player[:playerID]}) ON DUPLICATE KEY UPDATE team=VALUES(team), PlayerName=VALUES(PlayerName), position=VALUES(position)")
 		#client.query("INSERT INTO collegeTeamRoster (team, PlayerName, position, playerID) VALUES (#{player[:teamName]}, #{player[:playerName]}, #{player[:position]}, #{player[:playerID]}) ON DUPLICATE KEY IGNORE")

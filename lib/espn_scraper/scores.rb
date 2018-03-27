@@ -395,6 +395,7 @@ module ESPN
 				statNum = 0
 				playerStats = {}
 				playerStats[:teamName] = teamID[:teamName]
+				playerStats[:teamID] = teamID[:link].partition('=').last
 				if playerRow['class'] == "oddrow" || playerRow['class'] == "evenrow"
 					playerRow.children.each do |playerInfo|
 						#playerInfo.children.each do |i|
