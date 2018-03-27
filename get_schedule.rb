@@ -26,10 +26,10 @@ client.query("truncate gametimes")
 client.query("set session time_zone = \"+00:00\"")
 schedule.each do |game|
 	game.each do |row|
-		queryString = "INSERT INTO gametimes (gameID, week, team, gameTime) VALUES("
+		queryString = "INSERT INTO gametimes (teamID, gameID, week, team, gameTime) VALUES("
 		row.each_with_index do |(key,value),i|
 			if i == row.size - 1
-				queryString += "'" + value.to_s + "') ON DUPLICATE KEY UPDATE gameID=VALUES(gameID), week=VALUES(week), team=VALUES(team), gameTime=VALUES(gameTime)"
+				queryString += "'" + value.to_s + "') ON DUPLICATE KEY UPDATE teamID=VALUES(teamID), gameID=VALUES(gameID), week=VALUES(week), team=VALUES(team), gameTime=VALUES(gameTime)"
 			else
 				queryString += "'" + value.to_s + "', "
 			end

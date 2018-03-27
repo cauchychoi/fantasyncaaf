@@ -375,7 +375,7 @@ module ESPN
 			displayName = team['team']['displayName']
 			displayName.slice!(team['team']['shortDisplayName'])  #isolate school name. e.g. displayName = USC Trojans, shortDisplayName = Trojans
 			displayName = displayName.strip
-			weekSchedule.push({:gameID => uidShort, :week => week, :team => displayName, :gametime => dateTime})
+			weekSchedule.push({:teamID => team['id'], :gameID => uidShort, :week => week, :team => displayName, :gametime => dateTime})
 		  end
 		 
           #date = date.new_offset('-08:00') #convert from GMT to PST
