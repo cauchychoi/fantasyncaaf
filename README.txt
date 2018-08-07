@@ -11,3 +11,10 @@ Configurations in ESPN.get_schedule():
 	Year (Current = 2018)
 	Conference (Pac12 = 9)
 	week (configurable for loop)
+	
+	
+If changes are made to scores.rb:
+	gem uninstall espn_scraper-1.5.1.gem
+	gem build espn_scraper.gemspec
+	gem install espn_scraper-1.5.1.gem
+Before pushing to github/heroku, remove espn_scraper-1.5.1.gem from the folder
