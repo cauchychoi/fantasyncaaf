@@ -22,7 +22,8 @@ for week in 1..3   # update this depending on what weeks you want
 	schedule = ESPN.get_schedule(2018, 9, week)
 
 	# Populating gametimes table
-	#client.query("truncate gametimes")
+	deleteString = "delete from gametimes where week=" + week
+	client.query(deleteString)
 	client.query("set session time_zone = \"+00:00\"")
 	schedule.each do |game|
 		game.each do |row|
