@@ -132,13 +132,13 @@ module ESPN
 	  gameStats
 	end
 	
-	def get_schedule(year, conf)
+	def get_schedule(year, conf, week)
 		seasonSchedule = []
-		for week in 1..13
+		#for week in 1..13
 			markup = Scores.markup_from_year_week_conf('college-football', year, week, conf)
 			weekSchedule = Scores.get_gameTimes(markup, week)
 			seasonSchedule << weekSchedule
-		end
+		#end
 		seasonSchedule
 	end
 	

@@ -7,4 +7,7 @@ Currently set to Pac12 only using an IF statement to filter the teams in get_ros
 	
 To refresh the season schedule, run:
 	ruby get_schedule.rb
-Currently set to Pac12 only because Pac12 = conference 9 in the function call ESPN.get_schedule(2017, 9) in get_schedule.rb
+Configurations in ESPN.get_schedule():
+	Year (Current = 2018)
+	Conference (Pac12 = 9)
+	week (configurable for loop)
