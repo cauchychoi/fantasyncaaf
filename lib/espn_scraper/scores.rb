@@ -661,6 +661,7 @@ module ESPN
 							stat[:fieldGoalsMade] = playerStat.content.partition('/').first
 						elsif playerStat['class'] == "xp"
 							stat[:extraPoints] = playerStat.content.partition('/').first
+							stat[:extraPointAttempts] = playerStat.content.partition('/').last
 						end
 					end
 				end

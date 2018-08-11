@@ -18,48 +18,49 @@ def calculateScores(stats)
 		#puts statRow
 		score = 0
 		fieldGoalAttempts = 0
+		extraPointAttempts = 0
 		statRow.each do |statName, statValue|
 			if statName.to_s.eql?("passingYards")
 				score += statValue.to_f * 0.04
 			elsif statName.to_s.eql?("passingTDs")
-				score += statValue.to_f * 4
+				score += statValue.to_f * 6
 			elsif statName.to_s.eql?("passingInterceptions") || statName.to_s.eql?("fumblesLost")
-				score -= statValue.to_f * 2
+				score -= statValue.to_f * 3
 			elsif statName.to_s.eql?("rushingYards") || statName.to_s.eql?("receivingYards")
 				score += statValue.to_f/10.0
 			elsif statName.to_s.eql?("rushingTDs") || statName.to_s.eql?("receivingTDs")
 				score += statValue.to_f * 6
-			#elsif statName.to_s.eql?("receptions") # Half PPR
-			#	score += (statValue.to_f)*0.5
-			elsif statName.to_s.eql?("fumblesLost")
-				score -= statValue.to_f * 2
+			elsif statName.to_s.eql?("receptions") # Half PPR
+				score += (statValue.to_f)*0.5
 				
-			elsif statName.to_s.eql?("fumblesRecovered") || statName.to_s.eql?("interceptions")
+			elsif statName.to_s.eql?("interceptions")
 				score += statValue.to_f * 2
+			elsif statName.to_s.eql?("fumblesRecovered")
+				score += statValue.to_f * 3
 			elsif statName.to_s.eql?("sacks")
-				score += statValue.to_f * 1
+				score += statValue.to_f * 2
 			elsif statName.to_s.eql?("TDs")
 				score += statValue.to_f * 6
-			elsif statName.to_s.eql?("yardsAllowed")
-				if statValue.to_f < 100
-					score += 5
-				elsif statValue.to_f < 200
-					score += 3
-				elsif statValue.to_f < 300
-					score += 2
-				elsif statValue.to_f < 350
-					score += 0
-				elsif statValue.to_f < 400
-					score -= 1
-				elsif statValue.to_f < 450
-					score -= 3
-				elsif statValue.to_f < 500
-					score -= 5
-				elsif statValue.to_f < 550
-					score -= 6
-				else
-					score -= 7
-				end
+			#elsif statName.to_s.eql?("yardsAllowed")
+			#	if statValue.to_f < 100
+			#		score += 5
+			#	elsif statValue.to_f < 200
+			#		score += 3
+			#	elsif statValue.to_f < 300
+			#		score += 2
+			#	elsif statValue.to_f < 350
+			#		score += 0
+			#	elsif statValue.to_f < 400
+			#		score -= 1
+			#	elsif statValue.to_f < 450
+			#		score -= 3
+			#	elsif statValue.to_f < 500
+			#		score -= 5
+			#	elsif statValue.to_f < 550
+			#		score -= 6
+			#	else
+			#		score -= 7
+			#	end
 			elsif statName.to_s.eql?("pointsAllowed")
 				if statValue.to_f < 1
 					score += 5
@@ -81,9 +82,11 @@ def calculateScores(stats)
 			elsif statName.to_s.eql?("safeties") || statName.to_s.eql?("blockedKicks")
 				score += statValue.to_f * 2
 
-			
+			elsif statName.to_s.eql?("extraPointAttempts")
+				extraPointAttempts = statValue.to_f
 			elsif statName.to_s.eql?("extraPoints")
 				score += statValue.to_f * 1
+				score -= extraPointAttempts - statValue.to_f
 			elsif statName.to_s.eql?("fieldGoalAttempts")
 				fieldGoalAttempts = statValue.to_f
 			elsif statName.to_s.eql?("fieldGoalsMade")
