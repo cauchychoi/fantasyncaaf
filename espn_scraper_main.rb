@@ -32,6 +32,8 @@ def calculateScores(stats)
 				score += statValue.to_f * 6
 			elsif statName.to_s.eql?("receptions") # Half PPR
 				score += (statValue.to_f)*0.5
+			elsif statName.to_s.eql?("twoPointConversions")
+				score += statValue.to_f * 2
 				
 			elsif statName.to_s.eql?("interceptions")
 				score += statValue.to_f * 2
@@ -39,8 +41,12 @@ def calculateScores(stats)
 				score += statValue.to_f * 3
 			elsif statName.to_s.eql?("sacks")
 				score += statValue.to_f * 2
-			elsif statName.to_s.eql?("TDs")
+			elsif statName.to_s.eql?("TDs") || statName.to_s.eql?("safeties")
 				score += statValue.to_f * 6
+			elsif statName.to_s.eql?("interceptionYards")
+				score += statValue.to_f / 5.0
+			elsif statName.to_s.eql?("kickReturnYards") || statName.to_s.eql?("puntReturnYards")
+				score += statValue.to_f / 25.0
 			#elsif statName.to_s.eql?("yardsAllowed")
 			#	if statValue.to_f < 100
 			#		score += 5
@@ -79,8 +85,10 @@ def calculateScores(stats)
 				else
 					score -= 5
 				end
-			elsif statName.to_s.eql?("safeties") || statName.to_s.eql?("blockedKicks")
+			elsif statName.to_s.eql?("returnsPAT") || statName.to_s.eql?("blockedKicks")
 				score += statValue.to_f * 2
+			elsif statName.to_s.eql?("onePtSafetiesPAT")
+				score += statValue.to_f
 
 			elsif statName.to_s.eql?("extraPointAttempts")
 				extraPointAttempts = statValue.to_f
