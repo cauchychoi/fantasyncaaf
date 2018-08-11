@@ -34,7 +34,7 @@ roster.each do |player|
 	end
 	
 	#DEBUG PAC 12
-	if (teamName.to_s.eql?("Arizona") || teamName.to_s.eql?("Arizona State") || teamName.to_s.eql?("Washington") || teamName.to_s.eql?("Washington State") || teamName.to_s.eql?("Oregon") || teamName.to_s.eql?("Oregon State") || teamName.to_s.eql?("USC") || teamName.to_s.eql?("UCLA") || teamName.to_s.eql?("Cal") || teamName.to_s.eql?("Stanford") || teamName.to_s.eql?("Utah") || teamName.to_s.eql?("Colorado"))
+	if (teamName.to_s.eql?("Arizona") || teamName.to_s.eql?("Arizona State") || teamName.to_s.eql?("Washington") || teamName.to_s.eql?("Washington St") || teamName.to_s.eql?("Oregon") || teamName.to_s.eql?("Oregon State") || teamName.to_s.eql?("USC") || teamName.to_s.eql?("UCLA") || teamName.to_s.eql?("Cal") || teamName.to_s.eql?("Stanford") || teamName.to_s.eql?("Utah") || teamName.to_s.eql?("Colorado"))
 	
 	if (!teamName.to_s.eql?("") && !playerName.to_s.eql?("") && !position.to_s.eql?("") && !playerID.to_s.eql?("") && !position.to_s.eql?("DB") && !position.to_s.eql?("LB") && !position.to_s.eql?("G") && !position.to_s.eql?("LS") && !position.to_s.eql?("OL") && !position.to_s.eql?("DT") && !position.to_s.eql?("S") && !position.to_s.eql?("CB") && !position.to_s.eql?("P") && !position.to_s.eql?("C") && !position.to_s.eql?("DL") && !position.to_s.eql?("DE") && !position.to_s.eql?("OT") && !position.to_s.eql?("NT"))
 		playerAbbr = playerName[0] + ".  " + playerName.split[1..-1].join(' ')
