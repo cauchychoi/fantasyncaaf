@@ -420,7 +420,7 @@ module ESPN
 	  end
 	  
 	  def get_kicker_scores(playerID, gameID)
-		html = ESPN.get 'scores', 'college-football', "player/_/id/#{playerID}"
+		html = ESPN.get 'scores', 'college-football', "player/gamelog/_/id/#{playerID}"
 		#puts playerID
 		#puts gameID
 		kickerStats = []
@@ -428,7 +428,7 @@ module ESPN
 		html.xpath("//tr").each do |row|
 			if row['class'] == "oddrow" || row['class'] == "evenrow"
 				row.children.each do |tdrow|
-					if (getStats < 5)
+					if (getStats < 5 && tdrow['class'] == "textright")
 						#puts tdrow
 						if (getStats == 0)
 							kickerStats[0] = tdrow.content.partition('/').first.to_i
