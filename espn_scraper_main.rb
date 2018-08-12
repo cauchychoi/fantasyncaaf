@@ -10,8 +10,17 @@ require 'mysql2'
 
 puts ESPN.responding?
 
+#client = Mysql2::Client.new(:host => "localhost", :username => "root")
+#mysql://b4078336a46f7e:10f5241c@us-cdbr-iron-east-05.cleardb.net/heroku_28ca4c386152c4f?reconnect=true
+#DB_HOST = us-cdbr-iron-east-05.cleardb.net
+#DB_DATABASE = heroku_28ca4c386152c4f
+#DB_USERNAME = b4078336a46f7e
+#DB_PASSWORD = 10f5241c
 
-def calculateScores(stats)
+client = Mysql2::Client.new(:host => "us-cdbr-iron-east-05.cleardb.net", :username => "b4078336a46f7e", :password => "10f5241c", :database => "heroku_28ca4c386152c4f")
+puts "Connection successful"
+
+def calculateScores(stats, client)
 	scores = []
 
 	stats.each do |statRow|
@@ -32,6 +41,13 @@ def calculateScores(stats)
 				score += statValue.to_f * 6
 			elsif statName.to_s.eql?("receptions") # Half PPR
 				score += (statValue.to_f)*0.5
+				client.query("SELECT position FROM collegeteamroster WHERE playerID="+statRow[:playerID].to_s).each do |result|  
+					if result["position"].to_s.eql?("TE")
+						score += (statValue.to_f)*0.5 # Bump TE up to full PPR
+					#else
+					#	score += (statValue.to_f)*0.5
+					end
+				end
 			elsif statName.to_s.eql?("twoPointConversions")
 				score += statValue.to_f * 2
 				
@@ -127,17 +143,6 @@ def calculateScores(stats)
 end
 
 
-#client = Mysql2::Client.new(:host => "localhost", :username => "root")
-#mysql://b4078336a46f7e:10f5241c@us-cdbr-iron-east-05.cleardb.net/heroku_28ca4c386152c4f?reconnect=true
-#DB_HOST = us-cdbr-iron-east-05.cleardb.net
-#DB_DATABASE = heroku_28ca4c386152c4f
-#DB_USERNAME = b4078336a46f7e
-#DB_PASSWORD = 10f5241c
-
-client = Mysql2::Client.new(:host => "us-cdbr-iron-east-05.cleardb.net", :username => "b4078336a46f7e", :password => "10f5241c", :database => "heroku_28ca4c386152c4f")
-puts "Connection successful"
-
-
 #for i in 1..1  # week
 #client.query("delete from offensestats where week=#{i}")
 #client.query("delete from defensestats where week=#{i}")
@@ -145,7 +150,7 @@ puts "Connection successful"
 
 weeklyStats = ESPN.get_pac12_game(2017, ARGV[0], Array(ARGV[1]))
 #weeklyStats = ESPN.get_pac12_games(2017, i)  # TODO: parameters should be year, week, gameID
-fantasyPoints = calculateScores(weeklyStats)
+fantasyPoints = calculateScores(weeklyStats, client)
 #puts weeklyStats
 #puts fantasyPoints
 
