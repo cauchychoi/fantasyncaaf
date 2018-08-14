@@ -37,7 +37,7 @@ def calculateScores(stats, client)
 				score -= statValue.to_f * 3
 			elsif statName.to_s.eql?("rushingYards") || statName.to_s.eql?("receivingYards")
 				score += statValue.to_f/10.0
-			elsif statName.to_s.eql?("rushingTDs") || statName.to_s.eql?("receivingTDs")
+			elsif statName.to_s.eql?("rushingTDs") || statName.to_s.eql?("receivingTDs") || statName.to_s.eql?("miscTDs")
 				score += statValue.to_f * 6
 			elsif statName.to_s.eql?("receptions") # Half PPR
 				score += (statValue.to_f)*0.5
@@ -51,6 +51,7 @@ def calculateScores(stats, client)
 			elsif statName.to_s.eql?("twoPointConversions")
 				score += statValue.to_f * 2
 				
+				
 			elsif statName.to_s.eql?("interceptions")
 				score += statValue.to_f * 2
 			elsif statName.to_s.eql?("fumblesRecovered")
@@ -60,7 +61,7 @@ def calculateScores(stats, client)
 			elsif statName.to_s.eql?("TDs") || statName.to_s.eql?("safeties")
 				score += statValue.to_f * 6
 			elsif statName.to_s.eql?("interceptionYards")
-				score += statValue.to_f / 5.0
+				score += statValue.to_f / 10.0
 			elsif statName.to_s.eql?("kickReturnYards") || statName.to_s.eql?("puntReturnYards")
 				score += statValue.to_f / 25.0
 			#elsif statName.to_s.eql?("yardsAllowed")
@@ -85,21 +86,25 @@ def calculateScores(stats, client)
 			#	end
 			elsif statName.to_s.eql?("pointsAllowed")
 				if statValue.to_f < 1
-					score += 5
+					score += 12
 				elsif statValue.to_f < 7
-					score += 4
+					score += 10
 				elsif statValue.to_f < 14
-					score += 3
-				elsif statValue.to_f < 18
-					score += 1
+					score += 8
+				elsif statValue.to_f < 21
+					score += 6
 				elsif statValue.to_f < 28
-					score += 0
+					score += 4
 				elsif statValue.to_f < 35
-					score -= 1
-				elsif statValue.to_f < 46
-					score -= 3
+					score += 2
+				elsif statValue.to_f < 42
+					score += 0
+				elsif statValue.to_f < 49
+					score -= 2
+				elsif statValue.to_f < 56
+					score -= 4
 				else
-					score -= 5
+					score -= 6
 				end
 			elsif statName.to_s.eql?("returnsPAT") || statName.to_s.eql?("blockedKicks")
 				score += statValue.to_f * 2
@@ -184,7 +189,7 @@ weeklyStats.each do |statRow|
 	
 	#if (statRow.has_key?(:fieldGoalAttempts))
 	#	tableName = "kickerStats"
-	if (statRow.has_key?(:passAttempts) || statRow.has_key?(:rushingAttempts) || statRow.has_key?(:receptions) || statRow.has_key?(:fumblesLost) || statRow.has_key?(:twoPointConversions) || statRow.has_key?(:fieldGoalAttempts))
+	if (statRow.has_key?(:passAttempts) || statRow.has_key?(:rushingAttempts) || statRow.has_key?(:receptions) || statRow.has_key?(:fumblesLost) || statRow.has_key?(:twoPointConversions) || statRow.has_key?(:fieldGoalAttempts) || statRow.has_key?(:fourtyYardTD) || statRow.has_key?(:sixtyYardTD) || statRow.has_key?(:eightyYardTD) || statRow.has_key?(:ninetyFiveYardTD) || statRow.has_key?(:miscTDs)) 
 		tableName = "offenseStats"
 	elsif (statRow.has_key?(:fumblesRecovered) || statRow.has_key?(:safeties) || statRow.has_key?(:blockedKicks) || statRow.has_key?(:returnsPAT))
 		tableName = "defenseStats"
