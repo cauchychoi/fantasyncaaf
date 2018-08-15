@@ -739,6 +739,8 @@ module ESPN
 						awayBlockedKicks = 0
 						home2ptReturnPAT = 0
 						away2ptReturnPAT = 0
+						homeSackYardage = 0
+						awaySackYardage = 0
 						twoPointConversions = {}
 						longTouchdowns = {}
 						espn_data.each do |group|
@@ -759,17 +761,26 @@ module ESPN
 											elsif playStats['start']['team']['id'].to_s.eql?(awayTeamId)
 												homeSafeties += 1 #flipped because the other team gets the points
 											end
+										
+										elsif playStats['type']['id'].to_s.eql?("7")  #7 = Sack
+											sackYards = playStats['text'][/(\w+)(?=\s*(yds|yards))(?!.*(\w+)(?=\s*(yds|yards)))/].to_i
+											if playStats['start']['team']['id'].to_s.eql?(homeTeamId) 
+												awaySackYardage += sackYards
+											else
+												homeSackYardage += sackYards
+											end
 											
+										
 										#37 = Blocked Punt Touchdown, 67 = Passing Touchdown  68 = Rushing Touchdown, 32 = Kickoff Return TD, 52 = Punt, 34 = Punt Ret TD, 38 = Blocked FG TD, 39 = Fumble Ret TD, 36 = Interception Return TD
 										elsif playStats['type']['id'].to_s.eql?("37") || playStats['type']['id'].to_s.eql?("67") || playStats['type']['id'].to_s.eql?("68") || playStats['type']['id'].to_s.eql?("32") || playStats['type']['id'].to_s.eql?("52") || playStats['type']['id'].to_s.eql?("34") || playStats['type']['id'].to_s.eql?("39") || playStats['type']['id'].to_s.eql?("39") || playStats['type']['id'].to_s.eql?("36")
 											patString = playStats['text'][/\(.*?\)/].to_s    #get string after TD between parentheses (should be PAT text)
-											touchdownString = playStats['text'][/^([^\(])+/].to_s
+											touchdownString = playStats['text'][/^([^\(])+/].to_s  #get string before the parentheses (should be TD text)
 											
 											if playStats['text'].include? "("	#filtering for only TDs hopefully
 												#puts touchdownString
 												
 												if touchdownString.downcase.include?("yd") || touchdownString.downcase.include?("yard")
-													touchdownYards = touchdownString[/(\w+)(?=\s*yds|yards)(?!.*(\w+)(?=\s*yds|yards))/].to_i
+													touchdownYards = touchdownString[/(\w+)(?=\s*(yds|yards))(?!.*(\w+)(?=\s*(yds|yards)))/].to_i
 													#puts touchdownYards
 													touchdownTeamHash = {}
 													touchdownTeamArray = []
@@ -882,6 +893,9 @@ module ESPN
 						
 						stats.push({:week => week, :teamID => awayTeamId, :safeties => awaySafeties})
 						stats.push({:week => week, :teamID => homeTeamId, :safeties => homeSafeties})
+						
+						stats.push({:week => week, :teamID => awayTeamId, :sackYards => awaySackYardage})
+						stats.push({:week => week, :teamID => homeTeamId, :sackYards => homeSackYardage})
 						
 						longTouchdowns.each do |playerID, bonuses|
 							bonuses.each do |bonusCategory, numBonus|

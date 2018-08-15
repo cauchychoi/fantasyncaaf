@@ -57,7 +57,9 @@ def calculateScores(stats, client)
 			elsif statName.to_s.eql?("fumblesRecovered")
 				score += statValue.to_f * 3
 			elsif statName.to_s.eql?("sacks")
-				score += statValue.to_f * 2
+				score += statValue.to_f
+			elsif statName.to_s.eql?("sackYards")
+				score += statValue.to_f / 10.0
 			elsif statName.to_s.eql?("TDs") || statName.to_s.eql?("safeties")
 				score += statValue.to_f * 6
 			elsif statName.to_s.eql?("interceptionYards")
@@ -191,7 +193,7 @@ weeklyStats.each do |statRow|
 	#	tableName = "kickerStats"
 	if (statRow.has_key?(:passAttempts) || statRow.has_key?(:rushingAttempts) || statRow.has_key?(:receptions) || statRow.has_key?(:fumblesLost) || statRow.has_key?(:twoPointConversions) || statRow.has_key?(:fieldGoalAttempts) || statRow.has_key?(:fourtyYardTD) || statRow.has_key?(:sixtyYardTD) || statRow.has_key?(:eightyYardTD) || statRow.has_key?(:ninetyFiveYardTD) || statRow.has_key?(:miscTDs)) 
 		tableName = "offenseStats"
-	elsif (statRow.has_key?(:fumblesRecovered) || statRow.has_key?(:safeties) || statRow.has_key?(:blockedKicks) || statRow.has_key?(:returnsPAT))
+	elsif (statRow.has_key?(:fumblesRecovered) || statRow.has_key?(:safeties) || statRow.has_key?(:blockedKicks) || statRow.has_key?(:returnsPAT) || statRow.has_key?(:sackYards))
 		tableName = "defenseStats"
 	end
 	
