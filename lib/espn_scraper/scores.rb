@@ -763,7 +763,7 @@ module ESPN
 											end
 										
 										elsif playStats['type']['id'].to_s.eql?("7")  #7 = Sack
-											sackYards = playStats['text'][/(\w+)(?=\s*(yds|yards))(?!.*(\w+)(?=\s*(yds|yards)))/].to_i
+											sackYards = playStats['text'][/(\w+)(?=\s*(yds|yards))/].to_i  # Get first instance of <xx> yards or yds (?= vs ?!)
 											if playStats['start']['team']['id'].to_s.eql?(homeTeamId) 
 												awaySackYardage += sackYards
 											else
@@ -780,7 +780,7 @@ module ESPN
 												#puts touchdownString
 												
 												if touchdownString.downcase.include?("yd") || touchdownString.downcase.include?("yard")
-													touchdownYards = touchdownString[/(\w+)(?=\s*(yds|yards))(?!.*(\w+)(?=\s*(yds|yards)))/].to_i
+													touchdownYards = touchdownString[/(\w+)(?=\s*(yds|yards))(?!.*(\w+)(?=\s*(yds|yards)))/].to_i  # # Get last instance of <xx> yards or yds (?= vs ?!)
 													#puts touchdownYards
 													touchdownTeamHash = {}
 													touchdownTeamArray = []
