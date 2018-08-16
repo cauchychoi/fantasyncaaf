@@ -28,5 +28,7 @@ task :test_update_scores do
 end
 
 task :update_leaguestandings do
-	ruby "update_leaguestandings.rb"
+	if Time.now.wday == 1
+		ruby "update_leaguestandings.rb"
+	end
 end
