@@ -673,12 +673,12 @@ module ESPN
 		  
 
 		  # IF KICKER, GO TO KICKER PLAYER PAGE AND GET STATS
-		  if stat.has_key?(:fieldGoalAttempts)
-			kickerStats = get_kicker_scores(stat[:playerID], page) # returns an array of length 3 for 0-39, 40-49, 50+ yards
-			stat[:shortFGsMade] = kickerStats[0]
-			stat[:medFGsMade] = kickerStats[1]
-			stat[:longFGsMade] = kickerStats[2]
-		  end
+		  #if stat.has_key?(:fieldGoalAttempts)
+			#kickerStats = get_kicker_scores(stat[:playerID], page) # returns an array of length 3 for 0-39, 40-49, 50+ yards
+			#stat[:shortFGsMade] = kickerStats[0]
+			#stat[:medFGsMade] = kickerStats[1]
+			#stat[:longFGsMade] = kickerStats[2]
+		  #end
 		  
 		  
 		  if stat != {} && (stat.has_key?(:completedPasses) || stat.has_key?(:rushingAttempts) || stat.has_key?(:receptions) || stat.has_key?(:fieldGoalAttempts) || stat.has_key?(:fumblesLost) || stat.has_key?(:twoPointConversions) || stat.has_key?(:miscTDs))
@@ -743,6 +743,7 @@ module ESPN
 						awaySackYardage = 0
 						twoPointConversions = {}
 						longTouchdowns = {}
+						fieldGoals = {}
 						espn_data.each do |group|
 							group.each do |play|
 								if play[0].to_s.eql?("play")
@@ -752,7 +753,50 @@ module ESPN
 									#puts playStats
 									unless playStats['type'].nil?
 										if playStats['type']['id'].to_s.eql?("59")  #59 = FG Good
-											#puts playStats['text']
+											fieldGoalString = playStats['text']
+											fieldGoalHash = {}
+											fieldGoalArray = []
+											fieldGoalTeamId = playStats['start']['team']['id']
+											fieldGoalHash[:link] = "teams/roster?teamId=#{fieldGoalTeamId}"
+											fieldGoalArray.push(fieldGoalHash)
+											fieldGoalTeamRoster = get_Roster(fieldGoalArray)
+											fieldGoalTeamRoster.each do |player|
+												unless player[:playerName].nil?
+													playerAbbrNoWhitespace = (player[:playerName].to_s)[0] + "." + player[:playerName].to_s.split[1..-1].join(' ')
+													if fieldGoalString.delete(' ').include?(player[:playerName].to_s.delete(' ')) || fieldGoalString.delete(' ').include?(playerAbbrNoWhitespace)
+														if !fieldGoals.has_key?(player[:playerID].to_sym)  # If the player doesn't exist
+															fieldGoals[player[:playerID].to_sym] = {}  # Create the key and Instantiate bonus categories
+														end
+														
+														if playStats['start']['yardsToEndzone'].to_i+17 <= 34  # These bonus categories must match in MySQL table
+															if !fieldGoals[player[:playerID].to_sym].has_key?(:shortFGsMade)  # If the bonus category doesn't exist, insert a score of 1
+																fieldGoals[player[:playerID].to_sym][:shortFGsMade] = 1
+															else
+																fieldGoals[player[:playerID].to_sym][:shortFGsMade] += 1
+															end
+														elsif playStats['start']['yardsToEndzone'].to_i+17 <= 49
+															if !fieldGoals[player[:playerID].to_sym].has_key?(:medFGsMade)
+																fieldGoals[player[:playerID].to_sym][:medFGsMade] = 1
+															else
+																fieldGoals[player[:playerID].to_sym][:medFGsMade] += 1
+															end
+														elsif playStats['start']['yardsToEndzone'].to_i+17 <= 59
+															if !fieldGoals[player[:playerID].to_sym].has_key?(:longFGsMade)
+																fieldGoals[player[:playerID].to_sym][:longFGsMade] = 1
+															else
+																fieldGoals[player[:playerID].to_sym][:longFGsMade] += 1
+															end
+														elsif playStats['start']['yardsToEndzone'].to_i+17 >= 60
+															if !fieldGoals[player[:playerID].to_sym].has_key?(:extraLongFGsMade)
+																fieldGoals[player[:playerID].to_sym][:extraLongFGsMade] = 1
+															else
+																fieldGoals[player[:playerID].to_sym][:extraLongFGsMade] += 1
+															end
+														end														
+													end
+												end
+											end
+											
 										elsif playStats['type']['id'].to_s.eql?("20")  #20 = Safety
 											#puts playStats
 											#safeties += 1
@@ -769,7 +813,7 @@ module ESPN
 											else
 												homeSackYardage += sackYards
 											end
-											
+										
 										
 										#37 = Blocked Punt Touchdown, 67 = Passing Touchdown  68 = Rushing Touchdown, 32 = Kickoff Return TD, 52 = Punt, 34 = Punt Ret TD, 38 = Blocked FG TD, 39 = Fumble Ret TD, 36 = Interception Return TD
 										elsif playStats['type']['id'].to_s.eql?("37") || playStats['type']['id'].to_s.eql?("67") || playStats['type']['id'].to_s.eql?("68") || playStats['type']['id'].to_s.eql?("32") || playStats['type']['id'].to_s.eql?("52") || playStats['type']['id'].to_s.eql?("34") || playStats['type']['id'].to_s.eql?("39") || playStats['type']['id'].to_s.eql?("39") || playStats['type']['id'].to_s.eql?("36")
@@ -896,6 +940,12 @@ module ESPN
 						
 						stats.push({:week => week, :teamID => awayTeamId, :sackYards => awaySackYardage})
 						stats.push({:week => week, :teamID => homeTeamId, :sackYards => homeSackYardage})
+						
+						fieldGoals.each do |playerID, distanceCategories|
+							distanceCategories.each do |distanceCategory, numFGs|
+								stats.push({:week => week, :playerID => playerID.to_s, distanceCategory.to_sym => numFGs})
+							end
+						end
 						
 						longTouchdowns.each do |playerID, bonuses|
 							bonuses.each do |bonusCategory, numBonus|

@@ -50,6 +50,14 @@ def calculateScores(stats, client)
 				end
 			elsif statName.to_s.eql?("twoPointConversions")
 				score += statValue.to_f * 2
+			elsif statName.to_s.eql?("fourtyYardTD")
+				score += statValue.to_f
+			elsif statName.to_s.eql?("sixtyYardTD")
+				score += statValue.to_f * 2
+			elsif statName.to_s.eql?("eightyYardTD")
+				score += statValue.to_f * 4
+			elsif statName.to_s.eql?("ninetyFiveYardTD")
+				score += statValue.to_f * 6
 				
 				
 			elsif statName.to_s.eql?("interceptions")
@@ -125,9 +133,11 @@ def calculateScores(stats, client)
 			elsif statName.to_s.eql?("shortFGsMade")
 				score += statValue.to_f * 3
 			elsif statName.to_s.eql?("medFGsMade")
-				score += statValue.to_f * 4
+				score += statValue.to_f * 6
 			elsif statName.to_s.eql?("longFGsMade")
-				score += statValue.to_f * 5	
+				score += statValue.to_f * 9
+			elsif statName.to_s.eql?("extraLongFGsMade")
+				score += statValue.to_f * 15
 			end
 		end
 		#statRow[:fantasyPoints] = score
@@ -191,7 +201,7 @@ weeklyStats.each do |statRow|
 	
 	#if (statRow.has_key?(:fieldGoalAttempts))
 	#	tableName = "kickerStats"
-	if (statRow.has_key?(:passAttempts) || statRow.has_key?(:rushingAttempts) || statRow.has_key?(:receptions) || statRow.has_key?(:fumblesLost) || statRow.has_key?(:twoPointConversions) || statRow.has_key?(:fieldGoalAttempts) || statRow.has_key?(:fourtyYardTD) || statRow.has_key?(:sixtyYardTD) || statRow.has_key?(:eightyYardTD) || statRow.has_key?(:ninetyFiveYardTD) || statRow.has_key?(:miscTDs)) 
+	if (statRow.has_key?(:passAttempts) || statRow.has_key?(:rushingAttempts) || statRow.has_key?(:receptions) || statRow.has_key?(:fumblesLost) || statRow.has_key?(:twoPointConversions) || statRow.has_key?(:fieldGoalAttempts) || statRow.has_key?(:fourtyYardTD) || statRow.has_key?(:sixtyYardTD) || statRow.has_key?(:eightyYardTD) || statRow.has_key?(:ninetyFiveYardTD) || statRow.has_key?(:miscTDs) || statRow.has_key?(:shortFGsMade) || statRow.has_key?(:medFGsMade) || statRow.has_key?(:longFGsMade) || statRow.has_key?(:extraLongFGsMade)) 
 		tableName = "offenseStats"
 	elsif (statRow.has_key?(:fumblesRecovered) || statRow.has_key?(:safeties) || statRow.has_key?(:blockedKicks) || statRow.has_key?(:returnsPAT) || statRow.has_key?(:sackYards))
 		tableName = "defenseStats"
