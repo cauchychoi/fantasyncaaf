@@ -13,16 +13,16 @@ task :update_scores do
 			ruby "espn_scraper_main.rb #{game['week']} #{game['gameID']}" 
 		end
 	end
+	#test
+	#if (Time.now.utc..Time.now.utc+(4.5*60*60)).cover?(Time.now.utc+(2*60*60))
+	#	puts "YAY"
+	#end
+	
+end
 
 task :test_update_scores do
 	ruby "espn_scraper_main.rb 12 400935323"
 	ruby "espn_scraper_main.rb 9 400935308"
 	ruby "espn_scraper_main.rb 10 400935313"
 	ruby "espn_scraper_main.rb 10 400935310"
-end
-	#test
-	#if (Time.now.utc..Time.now.utc+(4.5*60*60)).cover?(Time.now.utc+(2*60*60))
-	#	puts "YAY"
-	#end
-	
 end
