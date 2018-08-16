@@ -26,3 +26,7 @@ task :test_update_scores do
 	ruby "espn_scraper_main.rb 10 400935313"
 	ruby "espn_scraper_main.rb 10 400935310"
 end
+
+task :update_leaguestandings do
+	ruby "update_leaguestandings.rb"
+end
