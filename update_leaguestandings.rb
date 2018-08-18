@@ -10,8 +10,11 @@ puts "Connection successful"
 matchupSchedules = client.query("SELECT * FROM matchupschedule WHERE week="+currentWeekNum)
 
 matchupSchedules.each do |matchup|
-	homeScore = client.query("SELECT pointsScored FROM leaguescores WHERE week="+currentWeekNum+" AND teamID="+matchup["homeTeamID"])
-	awayScore = client.query("SELECT pointsScored FROM leaguescores WHERE week="+currentWeekNum+" AND teamID="+matchup["awayTeamID"])
+	homeScore = client.query("select sum(B.fantasyPoints) from teamRoster as A left join(select playerName name,week, fantasyPoints FROM offenseStats union select teamName name,week, fantasyPoints FROM defenseStats) as B on (A.playerName = B.name and A.week = B.week) where hasPlayed = 1 and A.teamID = "+matchup["homeTeamID"]+" and A.week = "+currentWeekNum)
+	awayScore = client.query("select sum(B.fantasyPoints) from teamRoster as A left join(select playerName name,week, fantasyPoints FROM offenseStats union select teamName name,week, fantasyPoints FROM defenseStats) as B on (A.playerName = B.name and A.week = B.week) where hasPlayed = 1 and A.teamID = "+matchup["awayTeamID"]+" and A.week = "+currentWeekNum)
+	
+	#homeScore = client.query("SELECT pointsScored FROM leaguescores WHERE week="+currentWeekNum+" AND teamID="+matchup["homeTeamID"])
+	#awayScore = client.query("SELECT pointsScored FROM leaguescores WHERE week="+currentWeekNum+" AND teamID="+matchup["awayTeamID"])
 	
 	homeDivision = client.query("SELECT division FROM leaguestandings WHERE teamID="+matchup["homeTeamID"]
 	awayDivision = client.query("SELECT division FROM leaguestandings WHERE teamID="+matchup["awayTeamID"]
