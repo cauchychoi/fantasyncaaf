@@ -16,8 +16,8 @@ matchupSchedules.each do |matchup|
 	#homeScore = client.query("SELECT pointsScored FROM leaguescores WHERE week="+currentWeekNum+" AND teamID="+matchup["homeTeamID"])
 	#awayScore = client.query("SELECT pointsScored FROM leaguescores WHERE week="+currentWeekNum+" AND teamID="+matchup["awayTeamID"])
 	
-	homeDivision = client.query("SELECT division FROM leaguestandings WHERE teamID="+matchup["homeTeamID"]
-	awayDivision = client.query("SELECT division FROM leaguestandings WHERE teamID="+matchup["awayTeamID"]
+	homeDivision = client.query("SELECT division FROM leaguestandings WHERE teamID="+matchup["homeTeamID"])
+	awayDivision = client.query("SELECT division FROM leaguestandings WHERE teamID="+matchup["awayTeamID"])
 	
 	if homeScore > awayScore
 		if homeDivision == awayDivision
