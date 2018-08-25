@@ -14,7 +14,7 @@ Configurations in ESPN.get_schedule():
 	
 	
 If changes are made to scores.rb:
-	gem uninstall espn_scraper-1.5.1.gem
+	gem uninstall espn_scraper-1.5.1
 	gem build espn_scraper.gemspec
 	gem install espn_scraper-1.5.1.gem
 Before pushing to github/heroku, remove espn_scraper-1.5.1.gem from the folder
