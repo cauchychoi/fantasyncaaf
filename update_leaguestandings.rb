@@ -5,37 +5,27 @@ require 'mysql2'
 currentWeek = 1
 if (Time.now.utc > Time.new(2018,11,20,7,0,0,"+00:00"))
 	currentWeek = 13
-elsif (Time.now.utc > Time.new(2018,11,13,7,0,0,"+00:00")) {
+elsif (Time.now.utc > Time.new(2018,11,13,7,0,0,"+00:00"))
 	currentWeek = 12;
-}
-elsif (Time.now.utc > Time.new(2018,11,6,7,0,0,"+00:00")) {
+elsif (Time.now.utc > Time.new(2018,11,6,7,0,0,"+00:00")) 
 	currentWeek = 11;
-}
-elsif (Time.now.utc > Time.new(2018,10,30,7,0,0,"+00:00")) {
+elsif (Time.now.utc > Time.new(2018,10,30,7,0,0,"+00:00")) 
 	currentWeek = 10;
-}
-elsif (Time.now.utc > Time.new(2018,10,23,7,0,0,"+00:00")) {
+elsif (Time.now.utc > Time.new(2018,10,23,7,0,0,"+00:00")) 
 	currentWeek = 9;
-}
-elsif (Time.now.utc > Time.new(2018,10,16,7,0,0,"+00:00")) {
+elsif (Time.now.utc > Time.new(2018,10,16,7,0,0,"+00:00")) 
 	currentWeek = 8;
-}
-elsif (Time.now.utc > Time.new(2018,10,9,7,0,0,"+00:00")) {
+elsif (Time.now.utc > Time.new(2018,10,9,7,0,0,"+00:00")) 
 	currentWeek = 7;
-}
-elsif (Time.now.utc > Time.new(2018,10,2,7,0,0,"+00:00")) {
+elsif (Time.now.utc > Time.new(2018,10,2,7,0,0,"+00:00")) 
 	currentWeek = 6;
-}
-elsif (Time.now.utc > Time.new(2018,9,25,7,0,0,"+00:00")) {
+elsif (Time.now.utc > Time.new(2018,9,25,7,0,0,"+00:00")) 
 	currentWeek = 5;
-}
-elsif (Time.now.utc > Time.new(2018,9,18,7,0,0,"+00:00")) {
+elsif (Time.now.utc > Time.new(2018,9,18,7,0,0,"+00:00")) 
 	currentWeek = 4;
-}
-elsif (Time.now.utc > Time.new(2018,9,11,7,0,0,"+00:00")) {
+elsif (Time.now.utc > Time.new(2018,9,11,7,0,0,"+00:00")) 
 	currentWeek = 3;
-}
-elsif (Time.now.utc > Time.new(2018,9,4,7,0,0,"+00:00")) {
+elsif (Time.now.utc > Time.new(2018,9,4,7,0,0,"+00:00"))
 	currentWeek = 2;
 end
 
