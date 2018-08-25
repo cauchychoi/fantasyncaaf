@@ -132,6 +132,14 @@ module ESPN
 	  gameStats
 	end
 	
+	def get_mw_game(year, week, gameID)
+	  markup = Scores.markup_from_year_week_conf('college-football', year, week, 17)
+	  #gameIDs = Scores.get_gameIDs(markup)
+	  gameStats = Scores.get_stats_boxscore(gameID, week)
+	  gameStats = Scores.get_stats_summary(gameID, week, gameStats)
+	  gameStats
+	end
+	
 	def get_schedule(year, conf, week)
 		seasonSchedule = []
 		#for week in 1..13
