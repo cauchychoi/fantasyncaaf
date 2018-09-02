@@ -622,9 +622,9 @@ module ESPN
 						#elsif playerStat['class'] == "td" && player.parent.parent.parent.child.child.content.split[1] == "Defense"
 						elsif playerStat['class'] == "sacks" && tableNode.content.split.include?("Defense")
 							if (stat[:teamName] == teamNames[0])
-								team0Sacks += playerStat.content.to_i
+								team0Sacks += playerStat.content.to_f
 							elsif (stat[:teamName] == teamNames[1])
-								team1Sacks += playerStat.content.to_i
+								team1Sacks += playerStat.content.to_f
 							end
 						  
 						elsif playerStat['class'] == "td" && tableNode.content.split.include?("Defense")
