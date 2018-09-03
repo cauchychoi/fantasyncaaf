@@ -59,8 +59,8 @@ matchupSchedules.each do |matchup|
 		#	client.query("INSERT INTO leaguestandings (teamID, wins, losses, divisionWins, divisionLosses, pointsFor, pointsAgainst) VALUES('"+matchup["homeTeamID"].to_s+"', 1, 0, 1, 0, "+homeScore.to_s+", "+awayScore.to_s+") ON DUPLICATE KEY UPDATE wins=wins+1, divisionWins=divisionWins+1, pointsFor=pointsFor+"+homeScore.to_s+", pointsAgainst=pointsAgainst+"+awayScore.to_s)
 		#	client.query("INSERT INTO leaguestandings (teamID, wins, losses, divisionWins, divisionLosses, pointsFor, pointsAgainst) VALUES('"+matchup["awayTeamID"].to_s+"', 0, 1, 0, 1, "+awayScore.to_s+", "+homeScore.to_s+") ON DUPLICATE KEY UPDATE losses=losses+1, divisionLosses=divisionLosses+1, pointsFor=pointsFor+"+awayScore.to_s+", pointsAgainst=pointsAgainst+"+homeScore.to_s)
 		#else
-			client.query("INSERT INTO leaguestandings (teamID, wins, losses, pointsFor, pointsAgainst) VALUES('"+matchup["homeTeamID"]+"', 1, 0, "+homeScore.to_s+", "+awayScore.to_s+") ON DUPLICATE KEY UPDATE wins=wins+1, pointsFor=pointsFor+"+homeScore.to_s+", pointsAgainst=pointsAgainst+"+awayScore.to_s)
-			client.query("INSERT INTO leaguestandings (teamID, wins, losses, pointsFor, pointsAgainst) VALUES('"+matchup["awayTeamID"]+"', 0, 1, "+awayScore.to_s+", "+homeScore.to_s+") ON DUPLICATE KEY UPDATE losses=losses+1, pointsFor=pointsFor+"+awayScore.to_s+", pointsAgainst=pointsAgainst+"+homeScore.to_s)
+			client.query("INSERT INTO leaguestandings (teamID, wins, losses, pointsFor, pointsAgainst) VALUES('"+matchup["homeTeamID"].to_s+"', 1, 0, "+homeScore.to_s+", "+awayScore.to_s+") ON DUPLICATE KEY UPDATE wins=wins+1, pointsFor=pointsFor+"+homeScore.to_s+", pointsAgainst=pointsAgainst+"+awayScore.to_s)
+			client.query("INSERT INTO leaguestandings (teamID, wins, losses, pointsFor, pointsAgainst) VALUES('"+matchup["awayTeamID"].to_s+"', 0, 1, "+awayScore.to_s+", "+homeScore.to_s+") ON DUPLICATE KEY UPDATE losses=losses+1, pointsFor=pointsFor+"+awayScore.to_s+", pointsAgainst=pointsAgainst+"+homeScore.to_s)
 		#end
 	else
 		#if homeDivision == awayDivision
