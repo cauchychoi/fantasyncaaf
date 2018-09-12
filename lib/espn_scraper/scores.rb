@@ -814,17 +814,32 @@ module ESPN
 												homeSafeties += 1 #flipped because the other team gets the points
 											end
 										
-										elsif playStats['type']['id'].to_s.eql?("7")  #7 = Sack
-											sackYards = playStats['text'][/(\w+)(?=\s*(yd|yard))/].to_i  # Get first instance of <xx> yards or yds (?= vs ?!)
-											if playStats['start']['team']['id'].to_s.eql?(homeTeamId) 
-												awaySackYardage += sackYards
-											else
-												homeSackYardage += sackYards
+										elsif playStats['type']['id'].to_s.eql?("7") || playStats['type']['id'].to_s.eql?("9") || playStats['type']['id'].to_s.eql?("29") #7 = Sack, 9 = Fumble Recovery (Own), 29 = Fumble Recovery (Opponent)
+											if playStats['text'].to_s.downcase.include?("sack")
+												sackYards = playStats['text'][/(\w+)(?=\s*(yd|yard))/].to_i  # Get first instance of <xx> yards or yds (?= vs ?!)
+												if playStats['start']['team']['id'].to_s.eql?(homeTeamId) 
+													awaySackYardage += sackYards
+												else
+													homeSackYardage += sackYards
+												end
 											end
 										
 										
 										#37 = Blocked Punt Touchdown, 67 = Passing Touchdown  68 = Rushing Touchdown, 32 = Kickoff Return TD, 52 = Punt, 34 = Punt Ret TD, 38 = Blocked FG TD, 39 = Fumble Ret TD, 36 = Interception Return TD
 										elsif playStats['type']['id'].to_s.eql?("37") || playStats['type']['id'].to_s.eql?("67") || playStats['type']['id'].to_s.eql?("68") || playStats['type']['id'].to_s.eql?("32") || playStats['type']['id'].to_s.eql?("52") || playStats['type']['id'].to_s.eql?("34") || playStats['type']['id'].to_s.eql?("39") || playStats['type']['id'].to_s.eql?("39") || playStats['type']['id'].to_s.eql?("36")
+											# Account for potential sack yardage on fumble ret TD
+											if playStats['type']['id'].to_s.eql?("39")
+												if playStats['text'].to_s.downcase.include?("sack")
+													sackYards = playStats['text'][/(\w+)(?=\s*(yd|yard))/].to_i  # Get first instance of <xx> yards or yds (?= vs ?!)
+													if playStats['start']['team']['id'].to_s.eql?(homeTeamId) 
+														awaySackYardage += sackYards
+													else
+														homeSackYardage += sackYards
+													end
+												end
+											end
+											
+											
 											patString = playStats['text'][/\(.*?\)/].to_s    #get string after TD between parentheses (should be PAT text)
 											touchdownString = playStats['text'][/^([^\(])+/].to_s  #get string before the parentheses (should be TD text)
 											
