@@ -300,7 +300,6 @@ end
 offenseQuery += " ON DUPLICATE KEY UPDATE week=VALUES(week), playerID=VALUES(playerID), fantasyPoints=VALUES(fantasyPoints)"
 defenseQuery += " ON DUPLICATE KEY UPDATE week=VALUES(week), teamID=VALUES(teamID), fantasyPoints=VALUES(fantasyPoints)"
 
-puts offenseQuery
 client.query(offenseQuery)
 client.query(defenseQuery)
 
