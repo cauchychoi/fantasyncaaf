@@ -186,7 +186,6 @@ weeklyStats.each do |statRow|
 		if (statValue.is_a? String)
 			statValue = statValue.gsub("'", %q(\\\'))
 		end
-		
 		statNames[statCount] = statName
 		statValues[statCount] = statValue
 		statCount += 1
@@ -202,10 +201,10 @@ weeklyStats.each do |statRow|
 	
 	#if (statRow.has_key?(:fieldGoalAttempts))
 	#	tableName = "kickerStats"
-	if (statRow.has_key?(:passAttempts) || statRow.has_key?(:rushingAttempts) || statRow.has_key?(:receptions) || statRow.has_key?(:fumblesLost) || statRow.has_key?(:twoPointConversions) || statRow.has_key?(:fieldGoalAttempts) || statRow.has_key?(:fourtyYardTD) || statRow.has_key?(:sixtyYardTD) || statRow.has_key?(:eightyYardTD) || statRow.has_key?(:ninetyFiveYardTD) || statRow.has_key?(:miscTDs) || statRow.has_key?(:shortFGsMade) || statRow.has_key?(:medFGsMade) || statRow.has_key?(:longFGsMade) || statRow.has_key?(:extraLongFGsMade)) 
-		tableName = "offenseStats"
-	elsif (statRow.has_key?(:fumblesRecovered) || statRow.has_key?(:safeties) || statRow.has_key?(:blockedKicks) || statRow.has_key?(:returnsPAT) || statRow.has_key?(:sackYards))
+	if (statRow.has_key?(:fumblesRecovered) || statRow.has_key?(:safeties) || statRow.has_key?(:blockedKicks) || statRow.has_key?(:returnsPAT) || statRow.has_key?(:sackYards) || (statRow.has_key?(:teamID)&&statRow.has_key?(:fourtyYardTD)) || (statRow.has_key?(:teamID)&&statRow.has_key?(:sixtyYardTD)) || (statRow.has_key?(:teamID)&&statRow.has_key?(:eightyYardTD)) || (statRow.has_key?(:teamID)&&statRow.has_key?(:ninetyFiveYardTD)))
 		tableName = "defenseStats"
+	elsif (statRow.has_key?(:passAttempts) || statRow.has_key?(:rushingAttempts) || statRow.has_key?(:receptions) || statRow.has_key?(:fumblesLost) || statRow.has_key?(:twoPointConversions) || statRow.has_key?(:fieldGoalAttempts) || statRow.has_key?(:fourtyYardTD) || statRow.has_key?(:sixtyYardTD) || statRow.has_key?(:eightyYardTD) || statRow.has_key?(:ninetyFiveYardTD) || statRow.has_key?(:miscTDs) || statRow.has_key?(:shortFGsMade) || statRow.has_key?(:medFGsMade) || statRow.has_key?(:longFGsMade) || statRow.has_key?(:extraLongFGsMade)) 
+		tableName = "offenseStats"
 	end
 	
 	queryString = "INSERT INTO #{tableName} ("

@@ -751,6 +751,7 @@ module ESPN
 						awaySackYardage = 0
 						twoPointConversions = {}
 						longTouchdowns = {}
+						longTouchdownsDefense = {}
 						fieldGoals = {}
 						espn_data.each do |group|
 							group.each do |play|
@@ -847,62 +848,91 @@ module ESPN
 												#puts touchdownString
 												
 												if touchdownString.downcase.include?("yd") || touchdownString.downcase.include?("yard")
-													touchdownYards = touchdownString[/(\w+)(?=\s*(yd|yard))(?!.*(\w+)(?=\s*(yd|yard)))/].to_i  # # Get last instance of <xx> yards or yds (?= vs ?!)
+													touchdownYards = touchdownString[/(\w+)(?=\s*(yd|yard))(?!.*(\w+)(?=\s*(yd|yard)))/].to_i  # Get last instance of <xx> yards or yds (?= vs ?!)
 													#puts touchdownYards
 													touchdownTeamHash = {}
 													touchdownTeamArray = []
-													if playStats['type']['id'].to_s.eql?("67") || playStats['type']['id'].to_s.eql?("68")
+													if playStats['type']['id'].to_s.eql?("67") || playStats['type']['id'].to_s.eql?("68")    # Offensive TDs
 														touchdownTeamId = playStats['start']['team']['id']
-													else
+														
+														touchdownTeamHash[:link] = "teams/roster?teamId=#{touchdownTeamId}"
+														touchdownTeamArray.push(touchdownTeamHash)
+														touchdownTeamRoster = get_Roster(touchdownTeamArray)
+														touchdownTeamRoster.each do |player|
+															unless player[:playerName].nil?
+																playerAbbrNoWhitespace = (player[:playerName].to_s)[0] + "." + player[:playerName].to_s.split[1..-1].join(' ')
+																#puts player[:playerName]
+																if touchdownString.delete(' ').include?(player[:playerName].to_s.delete(' ')) || touchdownString.delete(' ').include?(playerAbbrNoWhitespace)
+																	#puts player[:playerID]
+																	if !longTouchdowns.has_key?(player[:playerID].to_sym) && touchdownYards >= 40  # If the player doesn't exist
+																		longTouchdowns[player[:playerID].to_sym] = {}  # Create the key and Instantiate bonus categories
+																	end
+																	if touchdownYards >= 95  # These bonus categories must match in MySQL table
+																		if !longTouchdowns[player[:playerID].to_sym].has_key?(:ninetyFiveYardTD)  # If the bonus category doesn't exist, insert a score of 1
+																			longTouchdowns[player[:playerID].to_sym][:ninetyFiveYardTD] = 1
+																		else
+																			longTouchdowns[player[:playerID].to_sym][:ninetyFiveYardTD] += 1
+																		end
+																	elsif touchdownYards >= 80
+																		if !longTouchdowns[player[:playerID].to_sym].has_key?(:eightyYardTD)
+																			longTouchdowns[player[:playerID].to_sym][:eightyYardTD] = 1
+																		else
+																			longTouchdowns[player[:playerID].to_sym][:eightyYardTD] += 1
+																		end
+																	elsif touchdownYards >= 60
+																		if !longTouchdowns[player[:playerID].to_sym].has_key?(:sixtyYardTD)
+																			longTouchdowns[player[:playerID].to_sym][:sixtyYardTD] = 1
+																		else
+																			longTouchdowns[player[:playerID].to_sym][:sixtyYardTD] += 1
+																		end
+																	elsif touchdownYards >= 40
+																		if !longTouchdowns[player[:playerID].to_sym].has_key?(:fourtyYardTD)
+																			longTouchdowns[player[:playerID].to_sym][:fourtyYardTD] = 1
+																		else
+																			longTouchdowns[player[:playerID].to_sym][:fourtyYardTD] += 1
+																		end
+																	end
+																	#puts longTouchdowns
+																	#SPLIT HERE BASED ON touchdownYards
+																end
+															end
+														end
+													else	# Defensive TDs
 														if playStats['start']['team']['id'].to_s.eql?(homeTeamId) 
 															touchdownTeamId = awayTeamId
 														else
 															touchdownTeamId = homeTeamId
 														end
-													end
-													#puts touchdownTeamId
-													touchdownTeamHash[:link] = "teams/roster?teamId=#{touchdownTeamId}"
-													touchdownTeamArray.push(touchdownTeamHash)
-													touchdownTeamRoster = get_Roster(touchdownTeamArray)
-													touchdownTeamRoster.each do |player|
-														unless player[:playerName].nil?
-															playerAbbrNoWhitespace = (player[:playerName].to_s)[0] + "." + player[:playerName].to_s.split[1..-1].join(' ')
-															#puts player[:playerName]
-															if touchdownString.delete(' ').include?(player[:playerName].to_s.delete(' ')) || touchdownString.delete(' ').include?(playerAbbrNoWhitespace)
-																#puts player[:playerID]
-																if !longTouchdowns.has_key?(player[:playerID].to_sym) && touchdownYards >= 40  # If the player doesn't exist
-																	longTouchdowns[player[:playerID].to_sym] = {}  # Create the key and Instantiate bonus categories
-																end
-																if touchdownYards >= 95  # These bonus categories must match in MySQL table
-																	if !longTouchdowns[player[:playerID].to_sym].has_key?(:ninetyFiveYardTD)  # If the bonus category doesn't exist, insert a score of 1
-																		longTouchdowns[player[:playerID].to_sym][:ninetyFiveYardTD] = 1
-																	else
-																		longTouchdowns[player[:playerID].to_sym][:ninetyFiveYardTD] += 1
-																	end
-																elsif touchdownYards >= 80
-																	if !longTouchdowns[player[:playerID].to_sym].has_key?(:eightyYardTD)
-																		longTouchdowns[player[:playerID].to_sym][:eightyYardTD] = 1
-																	else
-																		longTouchdowns[player[:playerID].to_sym][:eightyYardTD] += 1
-																	end
-																elsif touchdownYards >= 60
-																	if !longTouchdowns[player[:playerID].to_sym].has_key?(:sixtyYardTD)
-																		longTouchdowns[player[:playerID].to_sym][:sixtyYardTD] = 1
-																	else
-																		longTouchdowns[player[:playerID].to_sym][:sixtyYardTD] += 1
-																	end
-																elsif touchdownYards >= 40
-																	if !longTouchdowns[player[:playerID].to_sym].has_key?(:fourtyYardTD)
-																		longTouchdowns[player[:playerID].to_sym][:fourtyYardTD] = 1
-																	else
-																		longTouchdowns[player[:playerID].to_sym][:fourtyYardTD] += 1
-																	end
-																end
-																#puts longTouchdowns
-																#SPLIT HERE BASED ON touchdownYards
+														
+														if !longTouchdownsDefense.has_key?(touchdownTeamId.to_sym) && touchdownYards >= 40
+															longTouchdownsDefense[touchdownTeamId.to_sym] = {}
+														end
+														if touchdownYards >= 95
+															if !longTouchdownsDefense[touchdownTeamId.to_sym].has_key?(:ninetyFiveYardTD)
+																longTouchdownsDefense[touchdownTeamId.to_sym][:ninetyFiveYardTD] = 1
+															else
+																longTouchdownsDefense[touchdownTeamId.to_sym][:ninetyFiveYardTD] += 1
+															end
+														elsif touchdownYards >= 80
+															if !longTouchdownsDefense[touchdownTeamId.to_sym].has_key?(:eightyYardTD)
+																longTouchdownsDefense[touchdownTeamId.to_sym][:eightyYardTD] = 1
+															else
+																longTouchdownsDefense[touchdownTeamId.to_sym][:eightyYardTD] += 1
+															end
+														elsif touchdownYards >= 60
+															if !longTouchdownsDefense[touchdownTeamId.to_sym].has_key?(:sixtyYardTD)
+																longTouchdownsDefense[touchdownTeamId.to_sym][:sixtyYardTD] = 1
+															else
+																longTouchdownsDefense[touchdownTeamId.to_sym][:sixtyYardTD] += 1
+															end
+														elsif touchdownYards >= 40
+															if !longTouchdownsDefense[touchdownTeamId.to_sym].has_key?(:fourtyYardTD)
+																longTouchdownsDefense[touchdownTeamId.to_sym][:fourtyYardTD] = 1
+															else
+																longTouchdownsDefense[touchdownTeamId.to_sym][:fourtyYardTD] += 1
 															end
 														end
-													end
+													end											
 												end
 											end
 											
@@ -973,6 +1003,12 @@ module ESPN
 						longTouchdowns.each do |playerID, bonuses|
 							bonuses.each do |bonusCategory, numBonus|
 								stats.push({:week => week, :playerID => playerID.to_s, bonusCategory.to_sym => numBonus})
+							end
+						end
+						
+						longTouchdownsDefense.each do |teamID, bonuses|
+							bonuses.each do |bonusCategory, numBonus|
+								stats.push({:week => week, :teamID => teamID.to_s, bonusCategory.to_sym => numBonus})
 							end
 						end
 						
