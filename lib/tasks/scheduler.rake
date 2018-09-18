@@ -15,7 +15,7 @@ task :update_scores do
 		end
 	end
 	#test
-	#if (Time.now.utc..Time.now.utc+(8*60*60)).cover?(Time.now.utc+(2*60*60))
+	#if (Time.now.utc..Time.now.utc+(9*60*60)).cover?(Time.now.utc+(2*60*60))
 	#	puts "YAY"
 	#end
 	
