@@ -854,7 +854,13 @@ module ESPN
 													touchdownTeamArray = []
 													if playStats['type']['id'].to_s.eql?("67") || playStats['type']['id'].to_s.eql?("68")    # Offensive TDs
 														touchdownTeamId = playStats['start']['team']['id']
-														
+													else	# Defensive TDs
+														if playStats['start']['team']['id'].to_s.eql?(homeTeamId) 
+															touchdownTeamId = awayTeamId
+														else
+															touchdownTeamId = homeTeamId
+														end
+													end
 														touchdownTeamHash[:link] = "teams/roster?teamId=#{touchdownTeamId}"
 														touchdownTeamArray.push(touchdownTeamHash)
 														touchdownTeamRoster = get_Roster(touchdownTeamArray)
@@ -897,7 +903,8 @@ module ESPN
 																end
 															end
 														end
-													else	# Defensive TDs
+													#else	# Defensive TDs
+													if !(playStats['type']['id'].to_s.eql?("67") || playStats['type']['id'].to_s.eql?("68"))    # Defensive TDs
 														if playStats['start']['team']['id'].to_s.eql?(homeTeamId) 
 															touchdownTeamId = awayTeamId
 														else

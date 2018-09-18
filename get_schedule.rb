@@ -18,7 +18,7 @@ puts ESPN.responding?
 client = Mysql2::Client.new(:host => "us-cdbr-iron-east-05.cleardb.net", :username => "b4078336a46f7e", :password => "10f5241c", :database => "heroku_28ca4c386152c4f")
 puts "Connection successful"
 
-for week in 1..3   # update this depending on what weeks you want
+for week in 4..4   # update this depending on what weeks you want
 	schedule = ESPN.get_schedule(2018, 9, week)
 
 	# Populating gametimes table
