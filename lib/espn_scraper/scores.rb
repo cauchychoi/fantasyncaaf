@@ -398,17 +398,20 @@ module ESPN
 	  def get_Roster(teamIDs)
 	  roster = []
 		teamIDs.each { |teamID|
+			#puts teamID[:link]
 			html = ESPN.get 'scores', 'college-football', teamID[:link]
 			html.xpath("//tr").each do |playerRow|
+				#puts playerRow
 				statNum = 0
 				playerStats = {}
 				playerStats[:teamName] = teamID[:teamName]
 				playerStats[:teamID] = teamID[:link].partition('=').last
-				if playerRow['class'] == "oddrow" || playerRow['class'] == "evenrow"
+				#if playerRow['class'] == "oddrow" || playerRow['class'] == "evenrow"
+				if playerRow['class'] == "Table2__tr Table2__tr--sm Table2__even"
 					playerRow.children.each do |playerInfo|
 						#playerInfo.children.each do |i|
-							playerLink = playerInfo.child['href']
-							if playerLink =~ /id\/([^\/]+)\//
+							playerLink = playerInfo.child.child['href']
+							if playerLink =~ /id\/([^\/]+)/
 								playerStats[:playerID] = $~[1]
 							end
 						#end
@@ -763,6 +766,7 @@ module ESPN
 									unless playStats['type'].nil?
 										if playStats['type']['id'].to_s.eql?("59")  #59 = FG Good
 											fieldGoalString = playStats['text']
+											#puts fieldGoalString
 											fieldGoalHash = {}
 											fieldGoalArray = []
 											fieldGoalTeamId = playStats['start']['team']['id']
