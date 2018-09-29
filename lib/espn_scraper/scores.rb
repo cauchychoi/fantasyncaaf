@@ -568,7 +568,7 @@ module ESPN
 						elsif playerStat['class'] == "name"
 							stat[:playerName] = playerStat.content
 							playerLink = playerStat.child['href']
-							if playerLink =~ /id\/([^\/]+)\//
+							if playerLink =~ /id\/([^\/]+)/
 								stat[:playerID] = $~[1]
 							end
 							playerStat.child.children.each do |findAbbr|
