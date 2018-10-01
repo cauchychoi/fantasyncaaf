@@ -1,4 +1,5 @@
 #!/usr/bin/ruby -w
+#Usage: ruby get_schedule.rb [week number range start] [week number range end]
 
 require 'espn_scraper'
 #require 'rubygems'
@@ -18,7 +19,10 @@ puts ESPN.responding?
 client = Mysql2::Client.new(:host => "us-cdbr-iron-east-05.cleardb.net", :username => "b4078336a46f7e", :password => "10f5241c", :database => "heroku_28ca4c386152c4f")
 puts "Connection successful"
 
-for week in 5..5   # update this depending on what weeks you want
+weekStart = ARGV[0]
+weekEnd = ARGV[1]
+
+for week in weekStart..weekEnd   # update this depending on what weeks you want
 	schedule = ESPN.get_schedule(2018, 9, week)
 
 	# Populating gametimes table
