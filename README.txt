@@ -12,6 +12,8 @@ Configurations in ESPN.get_schedule():
 	Conference (Pac12 = 9)
 	week (configurable for loop)
 	
+To refresh league standings, run:
+	ruby update_leaguestandings.rb
 	
 If changes are made to scores.rb:
 	gem uninstall espn_scraper-1.5.1

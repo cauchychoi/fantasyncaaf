@@ -8,7 +8,7 @@ task :update_scores do
 	gameTimes = client.query("select * from gametimes")
 	gameTimes.each do |game|
 		utcGameTime = Time.parse(game['gametime'].strftime('%Y-%m-%d %H:%M:%S UTC'))
-		if (utcGameTime..utcGameTime+(4.5*60*60)).cover?(Time.now.utc)
+		if (utcGameTime..utcGameTime+(10*60*60)).cover?(Time.now.utc)
 			puts "Updating scores from ESPN..."
 			ruby "updateTimesPlayerUsed.rb"
 			ruby "espn_scraper_main.rb #{game['week']} #{game['gameID']}" 
