@@ -4,29 +4,29 @@ require 'mysql2'
 require 'time'
 
 currentWeek = 1
-if (Time.now.utc > Time.new(2018,11,20,7,0,0,"+00:00"))
+if (Time.now.utc > Time.new(2019,11,19,7,0,0,"+00:00"))
 	currentWeek = 13
-elsif (Time.now.utc > Time.new(2018,11,13,7,0,0,"+00:00"))
+elsif (Time.now.utc > Time.new(2019,11,14,7,0,0,"+00:00"))
 	currentWeek = 12;
-elsif (Time.now.utc > Time.new(2018,11,6,7,0,0,"+00:00")) 
+elsif (Time.now.utc > Time.new(2019,11,5,7,0,0,"+00:00")) 
 	currentWeek = 11;
-elsif (Time.now.utc > Time.new(2018,10,30,7,0,0,"+00:00")) 
+elsif (Time.now.utc > Time.new(2019,10,29,7,0,0,"+00:00")) 
 	currentWeek = 10;
-elsif (Time.now.utc > Time.new(2018,10,23,7,0,0,"+00:00")) 
+elsif (Time.now.utc > Time.new(2019,10,22,7,0,0,"+00:00")) 
 	currentWeek = 9;
-elsif (Time.now.utc > Time.new(2018,10,16,7,0,0,"+00:00")) 
+elsif (Time.now.utc > Time.new(2019,10,15,7,0,0,"+00:00")) 
 	currentWeek = 8;
-elsif (Time.now.utc > Time.new(2018,10,9,7,0,0,"+00:00")) 
+elsif (Time.now.utc > Time.new(2019,10,8,7,0,0,"+00:00")) 
 	currentWeek = 7;
-elsif (Time.now.utc > Time.new(2018,10,2,7,0,0,"+00:00")) 
+elsif (Time.now.utc > Time.new(2019,10,1,7,0,0,"+00:00")) 
 	currentWeek = 6;
-elsif (Time.now.utc > Time.new(2018,9,25,7,0,0,"+00:00")) 
+elsif (Time.now.utc > Time.new(2019,9,24,7,0,0,"+00:00")) 
 	currentWeek = 5;
-elsif (Time.now.utc > Time.new(2018,9,18,7,0,0,"+00:00")) 
+elsif (Time.now.utc > Time.new(2019,9,17,7,0,0,"+00:00")) 
 	currentWeek = 4;
-elsif (Time.now.utc > Time.new(2018,9,11,7,0,0,"+00:00")) 
+elsif (Time.now.utc > Time.new(2019,9,10,7,0,0,"+00:00")) 
 	currentWeek = 3;
-elsif (Time.now.utc > Time.new(2018,9,4,7,0,0,"+00:00"))
+elsif (Time.now.utc > Time.new(2019,9,3,7,0,0,"+00:00"))
 	currentWeek = 2;
 end
 
