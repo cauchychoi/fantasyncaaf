@@ -23,7 +23,7 @@ weekStart = ARGV[0]
 weekEnd = ARGV[1]
 
 for week in weekStart..weekEnd   # update this depending on what weeks you want
-	schedule = ESPN.get_schedule(2018, 9, week)
+	schedule = ESPN.get_schedule(2019, 9, week)
 
 	# Populating gametimes table
 	deleteString = "DELETE FROM gametimes WHERE week=" + week.to_s
