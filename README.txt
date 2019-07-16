@@ -6,11 +6,11 @@ To refresh the college football roster, run:
 Currently set to Pac12 only using an IF statement to filter the teams in get_roster.rb
 	
 To refresh the season schedule, run:
-	ruby get_schedule.rb
+	ruby get_schedule.rb <weekRangeStart> <weekRangeEnd>
 Configurations in ESPN.get_schedule():
 	Year (Current = 2018)
 	Conference (Pac12 = 9)
-	week (configurable for loop)
+	#week (configurable for loop)
 	
 To refresh league standings, run:
 	ruby update_leaguestandings.rb
@@ -20,3 +20,6 @@ If changes are made to scores.rb:
 	gem build espn_scraper.gemspec
 	gem install espn_scraper-1.5.1.gem
 Before pushing to github/heroku, remove espn_scraper-1.5.1.gem from the folder
+
+For testing score scraping:
+	ruby espn_scraper_main.rb <week> <gameID>
