@@ -285,20 +285,45 @@ module ESPN
 		teamNames = []
 		count = 0
 		doc = ESPN.get 'scores', 'college-football', "teams"
-		doc.xpath("//li/h5").each do |team|
-			teamID = {}
+		#doc.xpath("//li/h5").each do |team|
+		espn_regex = /window\['__espnfitt__'\]=(\{.*?\});/
+		doc.xpath("//script").each do |script_section|
+			
 			#puts team.content
-			teamID[:teamName] = team.content
-			team.next.children.each do |info|
-				if (info.content == "Roster")
-					teamLink = info['href']
-					teamLink = teamLink[5..-1] # get rid of /ncf/
-					teamID[:link] = teamLink
-					#puts teamLink
-					#teamIDs << teamLink
-					teamIDs << teamID
+			if script_section.content =~ espn_regex
+				espn_data = JSON.parse(espn_regex.match(script_section.content)[1])
+				#espn_data['page']
+				espn_data['page']['content']['leagueTeams']['columns'].each do |column|
+					column['groups'].each do |conference|
+						conference['tms'].each do |team|
+							teamID = {}
+							teamID[:teamID] = team['id']
+							team['lk'].each do |metaData|
+								if metaData['t'] == "roster"
+									teamLink = metaData['u']
+									teamLink = teamLink[18..-1] # get rid of /college-football/
+									#puts teamLink
+									teamID[:link] = teamLink
+									teamIDs << teamID
+								end
+							end
+						end
+					end
 				end
+				#puts JSON.pretty_generate(espn_data)
+				#if espn_data['l'] == "Roster"
 			end
+			#teamID[:teamName] = team.content
+			#team.next.children.each do |info|
+			#	if (info.content == "Roster")
+			#		teamLink = info['href']
+			#		teamLink = teamLink[5..-1] # get rid of /ncf/
+			#		teamID[:link] = teamLink
+			#		#puts teamLink
+			#		#teamIDs << teamLink
+			#		teamIDs << teamID
+			#	end
+			#end
 			
 		end
 		#puts teamIDs
@@ -400,31 +425,46 @@ module ESPN
 		teamIDs.each { |teamID|
 			#puts teamID[:link]
 			html = ESPN.get 'scores', 'college-football', teamID[:link]
-			html.xpath("//tr").each do |playerRow|
+			#html.xpath("//tr").each do |playerRow|
+			espn_regex = /window\['__espnfitt__'\]=(\{.*?\});/
+			html.xpath("//script").each do |script_section|
 				#puts playerRow
-				statNum = 0
-				playerStats = {}
-				playerStats[:teamName] = teamID[:teamName]
-				playerStats[:teamID] = teamID[:link].partition('=').last
-				#if playerRow['class'] == "oddrow" || playerRow['class'] == "evenrow"
-				if playerRow['class'] == "Table2__tr Table2__tr--sm Table2__even"
-					playerRow.children.each do |playerInfo|
-						#playerInfo.children.each do |i|
-							playerLink = playerInfo.child.child['href']
-							if playerLink =~ /id\/([^\/]+)/
-								playerStats[:playerID] = $~[1]
-							end
-						#end
-						if statNum == 1
-							playerStats[:playerName] = playerInfo.content
-						elsif statNum == 2
-							playerStats[:position] = playerInfo.content
+				#statNum = 0
+				if script_section.content =~ espn_regex
+					espn_data = JSON.parse(espn_regex.match(script_section.content)[1])
+					espn_data['page']['content']['roster']['groups'].each do |playerType|
+						playerType['athletes'].each do |player|
+							playerStats = {}
+							playerStats[:playerName] = player['name']
+							playerStats[:playerID] = player['id']
+							playerStats[:position] = player['position']
+							playerStats[:teamName] = player['college']
+							playerStats[:teamID] = teamID[:teamID]
+							roster << playerStats
+							#puts playerStats
 						end
-						statNum += 1
 					end
 				end
-				roster << playerStats
-				#puts playerStats
+				
+#				playerStats[:teamName] = teamID[:teamName]
+#				playerStats[:teamID] = teamID[:link].partition('=').last
+#				#if playerRow['class'] == "oddrow" || playerRow['class'] == "evenrow"
+#				if playerRow['class'] == "Table2__tr Table2__tr--sm Table2__even"
+#					playerRow.children.each do |playerInfo|
+#						#playerInfo.children.each do |i|
+#							playerLink = playerInfo.child.child['href']
+#							if playerLink =~ /id\/([^\/]+)/
+#								playerStats[:playerID] = $~[1]
+#							end
+#						#end
+#						if statNum == 1
+#							playerStats[:playerName] = playerInfo.content
+#						elsif statNum == 2
+#							playerStats[:position] = playerInfo.content
+#						end
+#						statNum += 1
+#					end
+#				end
 			end
 		}
 	  roster

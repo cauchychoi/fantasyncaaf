@@ -8,4 +8,4 @@ gem 'mysql2'
 gem 'pg'
 gem 'dbi'
 gem 'espn_scraper', '>=1.5.1', git: "https://github.com/cauchychoi/fantasyncaaf.git"
-ruby '2.4.3'
+ruby '2.4.6'
