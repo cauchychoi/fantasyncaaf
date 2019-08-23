@@ -38,8 +38,8 @@ matchupSchedules = client.query("SELECT * FROM matchupschedule WHERE week<="+cur
 matchupSchedules.each do |matchup|
 	homeScore = 0
 	awayScore = 0
-	#homeDivision = ""
-	#awayDivision = ""
+	homeDivision = ""
+	awayDivision = ""
 	
 	client.query("select sum(B.fantasyPoints) as fantasyPoints from teamRoster as A left join(select playerName name,week, fantasyPoints FROM offenseStats union select teamName name,week, fantasyPoints FROM defenseStats) as B on (A.playerName = B.name and A.week = B.week) where hasPlayed = 1 and A.teamID = "+matchup["homeTeamID"].to_s+" and A.week = "+matchup["week"].to_s).each do |row|
 		homeScore = row["fantasyPoints"].to_f
@@ -48,29 +48,29 @@ matchupSchedules.each do |matchup|
 		awayScore = row["fantasyPoints"].to_f
 	end
 	
-	#client.query("SELECT division FROM leaguestandings WHERE teamID="+matchup["homeTeamID"].to_s).each do |row|
-	#	homeDivision = row["division"]
-	#end
-	#client.query("SELECT division FROM leaguestandings WHERE teamID="+matchup["awayTeamID"].to_s).each do |row|
-	#	awayDivision = row["division"]
-	#end
+	client.query("SELECT division FROM leaguestandings WHERE teamID="+matchup["homeTeamID"].to_s).each do |row|
+		homeDivision = row["division"]
+	end
+	client.query("SELECT division FROM leaguestandings WHERE teamID="+matchup["awayTeamID"].to_s).each do |row|
+		awayDivision = row["division"]
+	end
 	
 	if homeScore > awayScore
-		#if homeDivision == awayDivision
-		#	client.query("INSERT INTO leaguestandings (teamID, wins, losses, divisionWins, divisionLosses, pointsFor, pointsAgainst) VALUES('"+matchup["homeTeamID"].to_s+"', 1, 0, 1, 0, "+homeScore.to_s+", "+awayScore.to_s+") ON DUPLICATE KEY UPDATE wins=wins+1, divisionWins=divisionWins+1, pointsFor=pointsFor+"+homeScore.to_s+", pointsAgainst=pointsAgainst+"+awayScore.to_s)
-		#	client.query("INSERT INTO leaguestandings (teamID, wins, losses, divisionWins, divisionLosses, pointsFor, pointsAgainst) VALUES('"+matchup["awayTeamID"].to_s+"', 0, 1, 0, 1, "+awayScore.to_s+", "+homeScore.to_s+") ON DUPLICATE KEY UPDATE losses=losses+1, divisionLosses=divisionLosses+1, pointsFor=pointsFor+"+awayScore.to_s+", pointsAgainst=pointsAgainst+"+homeScore.to_s)
-		#else
+		if homeDivision == awayDivision
+			client.query("INSERT INTO leaguestandings (teamID, wins, losses, divisionWins, divisionLosses, pointsFor, pointsAgainst) VALUES('"+matchup["homeTeamID"].to_s+"', 1, 0, 1, 0, "+homeScore.to_s+", "+awayScore.to_s+") ON DUPLICATE KEY UPDATE wins=wins+1, divisionWins=divisionWins+1, pointsFor=pointsFor+"+homeScore.to_s+", pointsAgainst=pointsAgainst+"+awayScore.to_s)
+			client.query("INSERT INTO leaguestandings (teamID, wins, losses, divisionWins, divisionLosses, pointsFor, pointsAgainst) VALUES('"+matchup["awayTeamID"].to_s+"', 0, 1, 0, 1, "+awayScore.to_s+", "+homeScore.to_s+") ON DUPLICATE KEY UPDATE losses=losses+1, divisionLosses=divisionLosses+1, pointsFor=pointsFor+"+awayScore.to_s+", pointsAgainst=pointsAgainst+"+homeScore.to_s)
+		else
 			client.query("INSERT INTO leaguestandings (teamID, wins, losses, pointsFor, pointsAgainst) VALUES('"+matchup["homeTeamID"].to_s+"', 1, 0, "+homeScore.to_s+", "+awayScore.to_s+") ON DUPLICATE KEY UPDATE wins=wins+1, pointsFor=pointsFor+"+homeScore.to_s+", pointsAgainst=pointsAgainst+"+awayScore.to_s)
 			client.query("INSERT INTO leaguestandings (teamID, wins, losses, pointsFor, pointsAgainst) VALUES('"+matchup["awayTeamID"].to_s+"', 0, 1, "+awayScore.to_s+", "+homeScore.to_s+") ON DUPLICATE KEY UPDATE losses=losses+1, pointsFor=pointsFor+"+awayScore.to_s+", pointsAgainst=pointsAgainst+"+homeScore.to_s)
-		#end
+		end
 	elsif awayScore > homeScore
-		#if homeDivision == awayDivision
-		#	client.query("INSERT INTO leaguestandings (teamID, wins, losses, divisionWins, divisionLosses, pointsFor, pointsAgainst) VALUES('"+matchup["homeTeamID"].to_s+"', 0, 1, 0, 1, "+homeScore.to_s+", "+awayScore.to_s+") ON DUPLICATE KEY UPDATE losses=losses+1, divisionLosses=divisionLosses+1, pointsFor=pointsFor+"+homeScore.to_s+", pointsAgainst=pointsAgainst+"+awayScore.to_s)
-		#	client.query("INSERT INTO leaguestandings (teamID, wins, losses, divisionWins, divisionLosses, pointsFor, pointsAgainst) VALUES('"+matchup["awayTeamID"].to_s+"', 1, 0, 1, 0, "+awayScore.to_s+", "+homeScore.to_s+") ON DUPLICATE KEY UPDATE wins=wins+1, divisionWins=divisionWins+1, pointsFor=pointsFor+"+awayScore.to_s+", pointsAgainst=pointsAgainst+"+homeScore.to_s)
-		#else
+		if homeDivision == awayDivision
+			client.query("INSERT INTO leaguestandings (teamID, wins, losses, divisionWins, divisionLosses, pointsFor, pointsAgainst) VALUES('"+matchup["homeTeamID"].to_s+"', 0, 1, 0, 1, "+homeScore.to_s+", "+awayScore.to_s+") ON DUPLICATE KEY UPDATE losses=losses+1, divisionLosses=divisionLosses+1, pointsFor=pointsFor+"+homeScore.to_s+", pointsAgainst=pointsAgainst+"+awayScore.to_s)
+			client.query("INSERT INTO leaguestandings (teamID, wins, losses, divisionWins, divisionLosses, pointsFor, pointsAgainst) VALUES('"+matchup["awayTeamID"].to_s+"', 1, 0, 1, 0, "+awayScore.to_s+", "+homeScore.to_s+") ON DUPLICATE KEY UPDATE wins=wins+1, divisionWins=divisionWins+1, pointsFor=pointsFor+"+awayScore.to_s+", pointsAgainst=pointsAgainst+"+homeScore.to_s)
+		else
 			client.query("INSERT INTO leaguestandings (teamID, wins, losses, pointsFor, pointsAgainst) VALUES('"+matchup["homeTeamID"].to_s+"', 0, 1, "+homeScore.to_s+", "+awayScore.to_s+") ON DUPLICATE KEY UPDATE losses=losses+1, pointsFor=pointsFor+"+homeScore.to_s+", pointsAgainst=pointsAgainst+"+awayScore.to_s)
 			client.query("INSERT INTO leaguestandings (teamID, wins, losses, pointsFor, pointsAgainst) VALUES('"+matchup["awayTeamID"].to_s+"', 1, 0, "+awayScore.to_s+", "+homeScore.to_s+") ON DUPLICATE KEY UPDATE wins=wins+1, pointsFor=pointsFor+"+awayScore.to_s+", pointsAgainst=pointsAgainst+"+homeScore.to_s)
-		#end
+		end
 	end
 end
 
