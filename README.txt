@@ -23,3 +23,25 @@ Before pushing to github/heroku, remove espn_scraper-1.5.1.gem from the folder
 
 For testing score scraping:
 	ruby espn_scraper_main.rb <week> <gameID>
+
+For MAC:
+xcode-select --install
+
+ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+brew update
+brew install rbenv
+echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
+source ~/.bash_profile
+
+rbenv install 2.5.6
+rbenv global 2.5.6
+gem install rails --no-document
+
+brew install openssl
+export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/opt/openssl/lib/
+bundle config --local build.mysql2 "--with-ldflags=-L/usr/local/opt/openssl/lib --with-cppflags=-I/usr/local/opt/openssl/include"
+
+brew install postgresql
+
+gem install bundler
+bundle install

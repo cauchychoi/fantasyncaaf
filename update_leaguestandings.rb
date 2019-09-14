@@ -3,29 +3,29 @@
 require 'mysql2'
 
 currentWeek = 1
-if (Time.now.utc > Time.new(2019,11,19,7,0,0,"+00:00"))
+if (Time.now.utc > Time.new(2019,11,24,7,0,0,"+00:00"))
 	currentWeek = 13
-elsif (Time.now.utc > Time.new(2019,11,12,7,0,0,"+00:00"))
+elsif (Time.now.utc > Time.new(2019,11,17,7,0,0,"+00:00"))
 	currentWeek = 12;
-elsif (Time.now.utc > Time.new(2019,11,5,7,0,0,"+00:00")) 
+elsif (Time.now.utc > Time.new(2019,11,10,7,0,0,"+00:00")) 
 	currentWeek = 11;
-elsif (Time.now.utc > Time.new(2019,10,29,7,0,0,"+00:00")) 
+elsif (Time.now.utc > Time.new(2019,11,3,7,0,0,"+00:00")) 
 	currentWeek = 10;
-elsif (Time.now.utc > Time.new(2019,10,22,7,0,0,"+00:00")) 
+elsif (Time.now.utc > Time.new(2019,10,27,7,0,0,"+00:00")) 
 	currentWeek = 9;
-elsif (Time.now.utc > Time.new(2019,10,15,7,0,0,"+00:00")) 
+elsif (Time.now.utc > Time.new(2019,10,20,7,0,0,"+00:00")) 
 	currentWeek = 8;
-elsif (Time.now.utc > Time.new(2019,10,8,7,0,0,"+00:00")) 
+elsif (Time.now.utc > Time.new(2019,10,13,7,0,0,"+00:00")) 
 	currentWeek = 7;
-elsif (Time.now.utc > Time.new(2019,10,1,7,0,0,"+00:00")) 
+elsif (Time.now.utc > Time.new(2019,10,6,7,0,0,"+00:00")) 
 	currentWeek = 6;
-elsif (Time.now.utc > Time.new(2019,9,24,7,0,0,"+00:00")) 
+elsif (Time.now.utc > Time.new(2019,9,29,7,0,0,"+00:00")) 
 	currentWeek = 5;
-elsif (Time.now.utc > Time.new(2019,9,17,7,0,0,"+00:00")) 
+elsif (Time.now.utc > Time.new(2019,9,22,7,0,0,"+00:00")) 
 	currentWeek = 4;
-elsif (Time.now.utc > Time.new(2019,9,10,7,0,0,"+00:00")) 
+elsif (Time.now.utc > Time.new(2019,9,15,7,0,0,"+00:00")) 
 	currentWeek = 3;
-elsif (Time.now.utc > Time.new(2019,9,3,7,0,0,"+00:00"))
+elsif (Time.now.utc > Time.new(2019,9,8,7,0,0,"+00:00"))
 	currentWeek = 2;
 end
 
@@ -48,10 +48,10 @@ matchupSchedules.each do |matchup|
 		awayScore = row["fantasyPoints"].to_f
 	end
 	
-	client.query("SELECT division FROM leaguestandings WHERE teamID="+matchup["homeTeamID"].to_s).each do |row|
+	client.query("SELECT division FROM divisions WHERE teamID="+matchup["homeTeamID"].to_s).each do |row|
 		homeDivision = row["division"]
 	end
-	client.query("SELECT division FROM leaguestandings WHERE teamID="+matchup["awayTeamID"].to_s).each do |row|
+	client.query("SELECT division FROM divisions WHERE teamID="+matchup["awayTeamID"].to_s).each do |row|
 		awayDivision = row["division"]
 	end
 	

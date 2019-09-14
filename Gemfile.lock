@@ -17,13 +17,18 @@ GEM
     mini_portile2 (2.3.0)
     minitest (5.6.1)
     multi_xml (0.6.0)
-    mysql2 (0.3.21-x64-mingw32)
+    mysql2 (0.5.2)
+    mysql2 (0.5.2-x64-mingw32)
+    nokogiri (1.8.2)
+      mini_portile2 (~> 2.3.0)
     nokogiri (1.8.2-x64-mingw32)
       mini_portile2 (~> 2.3.0)
+    pg (1.0.0)
     pg (1.0.0-x64-mingw32)
     rake (10.4.2)
 
 PLATFORMS
+  ruby
   x64-mingw32
 
 DEPENDENCIES
@@ -31,13 +36,13 @@ DEPENDENCIES
   espn_scraper (>= 1.5.1)!
   httparty
   minitest (~> 5.6.0)
-  mysql2
+  mysql2 (~> 0.5.2)
   nokogiri
   pg
   rake (~> 10.4.2)
 
 RUBY VERSION
-   ruby 2.4.6p354
+   ruby 2.5.6p201
 
 BUNDLED WITH
    2.0.2
