@@ -861,8 +861,8 @@ module ESPN
 										
 										elsif playStats['type']['id'].to_s.eql?("7") || playStats['type']['id'].to_s.eql?("9") || playStats['type']['id'].to_s.eql?("29") #7 = Sack, 9 = Fumble Recovery (Own), 29 = Fumble Recovery (Opponent)
 											if playStats['text'].to_s.downcase.include?("sack")
-												sackYards = playStats['text'][/(\w+)(?=\s*(yd|yard))/].to_i  # Get first instance of <xx> yards or yds (?= vs ?!)
-												if playStats['start']['team']['id'].to_s.eql?(homeTeamId) 
+												sackYards = playStats['text'][/(\w+)(?=\s*( yd| yard))/].to_i  # Get first instance of <xx> yards or yds (?= vs ?!)
+                        if playStats['start']['team']['id'].to_s.eql?(homeTeamId) 
 													awaySackYardage += sackYards
 												else
 													homeSackYardage += sackYards
@@ -875,7 +875,7 @@ module ESPN
 											# Account for potential sack yardage on fumble ret TD
 											if playStats['type']['id'].to_s.eql?("39")
 												if playStats['text'].to_s.downcase.include?("sack")
-													sackYards = playStats['text'][/(\w+)(?=\s*(yd|yard))/].to_i  # Get first instance of <xx> yards or yds (?= vs ?!)
+													sackYards = playStats['text'][/(\w+)(?=\s*( yd| yard))/].to_i  # Get first instance of <xx> yards or yds (?= vs ?!)
 													if playStats['start']['team']['id'].to_s.eql?(homeTeamId) 
 														awaySackYardage += sackYards
 													else
@@ -892,7 +892,7 @@ module ESPN
 												#puts touchdownString
 												
 												if touchdownString.downcase.include?("yd") || touchdownString.downcase.include?("yard")
-													touchdownYards = touchdownString[/(\w+)(?=\s*(yd|yard))(?!.*(\w+)(?=\s*(yd|yard)))/].to_i  # Get last instance of <xx> yards or yds (?= vs ?!)
+													touchdownYards = touchdownString[/(\w+)(?=\s*( yd| yard))(?!.*(\w+)(?=\s*( yd| yard)))/].to_i  # Get last instance of <xx> yards or yds (?= vs ?!)
 													#puts touchdownYards
 													touchdownTeamHash = {}
 													touchdownTeamArray = []
