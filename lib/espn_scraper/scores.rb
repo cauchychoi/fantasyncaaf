@@ -670,8 +670,8 @@ module ESPN
 								team1Sacks += playerStat.content.to_f
 							end
 						  
-						elsif playerStat['class'] == "td" && tableNode.content.split.include?("Defense")
-							if (stat[:teamName] == teamNames[0])
+						elsif playerStat['class'] == "td" && (tableNode.content.split.include?("Defense") || tableNode.content.split.include?("Defensive"))
+              if (stat[:teamName] == teamNames[0])
 								team0DefensiveTDs += playerStat.content.to_i
 							elsif (stat[:teamName] == teamNames[1])
 								team1DefensiveTDs += playerStat.content.to_i
