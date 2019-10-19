@@ -2,8 +2,11 @@
 
 require 'mysql2'
 
+# Week is set after games are played 
 currentWeek = 1
-if (Time.now.utc > Time.new(2019,11,24,7,0,0,"+00:00"))
+if (Time.now.utc > Time.new(2019,12,1,7,0,0,"+00:00"))
+	currentWeek = 14
+elsif (Time.now.utc > Time.new(2019,11,24,7,0,0,"+00:00"))
 	currentWeek = 13
 elsif (Time.now.utc > Time.new(2019,11,17,7,0,0,"+00:00"))
 	currentWeek = 12;

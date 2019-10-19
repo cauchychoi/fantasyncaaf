@@ -33,3 +33,38 @@ task :update_leaguestandings do
 		ruby "update_leaguestandings.rb"
 	end
 end
+
+# Get the next week's schedule (set to the Sunday before the week)
+task :update_gametimes do
+	if (Time.now.utc > Time.new(2019,11,24,7,0,0,"+00:00") && Time.now.utc < Time.new(2019,12,1,7,0,0,"+00:00"))
+		ruby "get_schedule.rb 14 14"
+	elsif (Time.now.utc > Time.new(2019,11,17,7,0,0,"+00:00"))
+		ruby "get_schedule.rb 13 13"
+	elsif (Time.now.utc > Time.new(2019,11,10,7,0,0,"+00:00")) 
+		ruby "get_schedule.rb 12 12"
+	elsif (Time.now.utc > Time.new(2019,11,3,7,0,0,"+00:00")) 
+		ruby "get_schedule.rb 11 11"
+	elsif (Time.now.utc > Time.new(2019,10,27,7,0,0,"+00:00")) 
+		ruby "get_schedule.rb 10 10"
+	elsif (Time.now.utc > Time.new(2019,10,20,7,0,0,"+00:00")) 
+		ruby "get_schedule.rb 9 9"
+	elsif (Time.now.utc > Time.new(2019,10,13,7,0,0,"+00:00")) 
+		ruby "get_schedule.rb 8 8"
+	elsif (Time.now.utc > Time.new(2019,10,6,7,0,0,"+00:00")) 
+		ruby "get_schedule.rb 7 7"
+	elsif (Time.now.utc > Time.new(2019,9,29,7,0,0,"+00:00")) 
+		ruby "get_schedule.rb 6 6"
+	elsif (Time.now.utc > Time.new(2019,9,22,7,0,0,"+00:00")) 
+		ruby "get_schedule.rb 5 5"
+	elsif (Time.now.utc > Time.new(2019,9,15,7,0,0,"+00:00")) 
+		ruby "get_schedule.rb 4 4"
+	elsif (Time.now.utc > Time.new(2019,9,8,7,0,0,"+00:00"))
+		ruby "get_schedule.rb 3 3"
+	elsif (Time.now.utc > Time.new(2019,9,1,7,0,0,"+00:00"))
+		ruby "get_schedule.rb 2 2"
+	elsif (Time.now.utc > Time.new(2019,8,18,7,0,0,"+00:00"))
+		ruby "get_schedule.rb 1 1"
+	end
+
+	elsif 	
+end
