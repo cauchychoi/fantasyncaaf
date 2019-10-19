@@ -64,7 +64,5 @@ task :update_gametimes do
 		ruby "get_schedule.rb 2 2"
 	elsif (Time.now.utc > Time.new(2019,8,18,7,0,0,"+00:00"))
 		ruby "get_schedule.rb 1 1"
-	end
-
-	elsif 	
+	end	
 end
