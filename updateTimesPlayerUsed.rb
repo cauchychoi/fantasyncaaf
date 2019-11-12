@@ -41,17 +41,19 @@ defenseProcessed = []
 client.query("select distinct C.playerID, C.fantasyID, C.teamID, C.position, C.hasPlayed, D.gametime from (select A.playerName, A.fantasyID, B.playerID, B.teamID, A.position, A.hasPlayed from (select teamID as fantasyID, playerName, position, hasPlayed from teamroster where week="+currentWeek.to_s+") as A inner join collegeteamroster as B on A.playerName=B.PlayerName or A.playerName=B.team) as C inner join gameTimes as D on C.teamID=D.teamID and week="+currentWeek.to_s).each do |player|
 	unless player["gametime"].nil?
 		gametime = Time.parse(player['gametime'].strftime('%Y-%m-%d %H:%M:%S UTC'))
-		if (Time.now.utc > gametime)
-			if (player["hasPlayed"] == 0)				
-				if (player["position"].eql?("DEF"))
-					unless defenseProcessed.include?(player["fantasyID"])
-						client.query("INSERT INTO timesplayerused (playerID, teamID, timesUsed) VALUES ("+player["teamID"].to_s+", "+player["fantasyID"].to_s+", 1) ON DUPLICATE KEY UPDATE timesUsed=timesUsed+1")
+		if !(currentWeek == 12 && (player["fantasyID"] == 101 || player["fantasyID"] == 151))  # Bonus game logic, won't run in week 12 for Cauchy and Channing
+			if (Time.now.utc > gametime)
+				if (player["hasPlayed"] == 0)				
+					if (player["position"].eql?("DEF"))
+						unless defenseProcessed.include?(player["fantasyID"])
+							client.query("INSERT INTO timesplayerused (playerID, teamID, timesUsed) VALUES ("+player["teamID"].to_s+", "+player["fantasyID"].to_s+", 1) ON DUPLICATE KEY UPDATE timesUsed=timesUsed+1")
+							client.query("UPDATE teamroster set hasPlayed = 1 where week = "+currentWeek.to_s+" and teamID = "+player["fantasyID"].to_s+" and position = \""+player["position"]+"\"")
+							defenseProcessed.push(player["fantasyID"])
+						end
+					else
+						client.query("INSERT INTO timesplayerused (playerID, teamID, timesUsed) VALUES ("+player["playerID"].to_s+", "+player["fantasyID"].to_s+", 1) ON DUPLICATE KEY UPDATE timesUsed=timesUsed+1")
 						client.query("UPDATE teamroster set hasPlayed = 1 where week = "+currentWeek.to_s+" and teamID = "+player["fantasyID"].to_s+" and position = \""+player["position"]+"\"")
-						defenseProcessed.push(player["fantasyID"])
 					end
-				else
-					client.query("INSERT INTO timesplayerused (playerID, teamID, timesUsed) VALUES ("+player["playerID"].to_s+", "+player["fantasyID"].to_s+", 1) ON DUPLICATE KEY UPDATE timesUsed=timesUsed+1")
-					client.query("UPDATE teamroster set hasPlayed = 1 where week = "+currentWeek.to_s+" and teamID = "+player["fantasyID"].to_s+" and position = \""+player["position"]+"\"")
 				end
 			end
 		end
