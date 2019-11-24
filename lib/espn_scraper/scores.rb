@@ -821,25 +821,25 @@ module ESPN
 															fieldGoals[player[:playerID].to_sym] = {}  # Create the key and Instantiate bonus categories
 														end
 														
-														if playStats['start']['yardsToEndzone'].to_i+18 <= 34  # These bonus categories must match in MySQL table
+														if playStats['start']['yardsToEndzone'].to_i+17 <= 34  # These bonus categories must match in MySQL table
 															if !fieldGoals[player[:playerID].to_sym].has_key?(:shortFGsMade)  # If the bonus category doesn't exist, insert a score of 1
 																fieldGoals[player[:playerID].to_sym][:shortFGsMade] = 1
 															else
 																fieldGoals[player[:playerID].to_sym][:shortFGsMade] += 1
 															end
-														elsif playStats['start']['yardsToEndzone'].to_i+18 <= 49
+														elsif playStats['start']['yardsToEndzone'].to_i+17 <= 49
 															if !fieldGoals[player[:playerID].to_sym].has_key?(:medFGsMade)
 																fieldGoals[player[:playerID].to_sym][:medFGsMade] = 1
 															else
 																fieldGoals[player[:playerID].to_sym][:medFGsMade] += 1
 															end
-														elsif playStats['start']['yardsToEndzone'].to_i+18 <= 59
+														elsif playStats['start']['yardsToEndzone'].to_i+17 <= 59
 															if !fieldGoals[player[:playerID].to_sym].has_key?(:longFGsMade)
 																fieldGoals[player[:playerID].to_sym][:longFGsMade] = 1
 															else
 																fieldGoals[player[:playerID].to_sym][:longFGsMade] += 1
 															end
-														elsif playStats['start']['yardsToEndzone'].to_i+18 >= 60
+														elsif playStats['start']['yardsToEndzone'].to_i+17 >= 60
 															if !fieldGoals[player[:playerID].to_sym].has_key?(:extraLongFGsMade)
 																fieldGoals[player[:playerID].to_sym][:extraLongFGsMade] = 1
 															else
