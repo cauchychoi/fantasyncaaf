@@ -1,6 +1,6 @@
 source 'https://rubygems.org/'
 
-gem 'rake', '~> 10.4.2'
+gem 'rake', '~> 12.3.3'
 gem 'httparty'
 gem 'nokogiri'
 gem 'minitest', '~> 5.6.0'
