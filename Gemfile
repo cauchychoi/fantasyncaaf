@@ -2,7 +2,7 @@ source 'https://rubygems.org/'
 
 gem 'rake', '~> 10.4.2'
 gem 'httparty'
-gem 'nokogiri'
+gem 'nokogiri', '>= 1.10.8'
 gem 'minitest', '~> 5.6.0'
 gem 'mysql2', '~> 0.5.2'
 gem 'pg'
