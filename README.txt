@@ -11,6 +11,12 @@ To reset a season:
 	Update currentWeek in updateTimesPlayerUsed.rb
 	Update currentWeek in update_leaguestandings.rb
 
+To upload to github/heroku:
+	git add . (in the context of your current folder)
+	git commit -m "<commit message>"
+	git push
+	git push heroku master
+
 To run the program in Heroku, go to the scheduler and run:
 	bundle exec rake update_scores
 	
