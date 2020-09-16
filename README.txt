@@ -1,3 +1,16 @@
+To reset a season:
+	truncate collegeteamroster
+	truncate offensestats
+	truncate defensestats
+	truncate teamroster
+	truncate timesplayerused
+	truncate leaguestandings
+	Manually modify matchupschedule
+	Manually modify divisions (if necessary)
+	Change get_schedule.rb to current year
+	Update currentWeek in updateTimesPlayerUsed.rb
+	Update currentWeek in update_leaguestandings.rb
+
 To run the program in Heroku, go to the scheduler and run:
 	bundle exec rake update_scores
 	
