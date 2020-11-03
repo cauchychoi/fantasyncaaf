@@ -10,7 +10,7 @@ puts ESPN.responding?
 #puts ESPN.get_teams_in('ncf')
 #ESPN.get_ncf_scores(2017, 11)
 roster = ESPN.get_All_Rosters()
-puts roster
+#puts roster
 #dbh = DBI.connect("DBI:Mysql:localhost:id3779293_ncaafstats", "id3779293_jcl", "jeffcauchylonny")
 
 #client = Mysql2::Client.new(:host => "localhost", :username => "root")
@@ -22,6 +22,9 @@ puts roster
 
 client = Mysql2::Client.new(:host => "us-cdbr-iron-east-05.cleardb.net", :username => "b4078336a46f7e", :password => "10f5241c", :database => "heroku_28ca4c386152c4f")
 puts "Connection successful"
+
+# To account for players who transfer out of the conference
+client.query("truncate collegeteamroster")
 
 roster.each do |player|
 	teamName = player[:teamName]

@@ -70,3 +70,8 @@ task :update_gametimes do
 		ruby "get_schedule.rb 1 1"
 	end	
 end
+
+# Refresh collegeteamroster for transfers
+task :update_collegeteamroster do
+	ruby "get_roster.rb"
+end
