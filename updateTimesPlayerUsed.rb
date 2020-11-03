@@ -5,7 +5,9 @@ require 'time'
 
 # Week is set before games are played
 currentWeek = 1
-if (Time.now.utc > Time.new(2020,12,1,7,0,0,"+00:00"))
+if (Time.now.utc > Time.new(2020,12,8,7,0,0,"+00:00"))
+	currentWeek = 15
+elsif (Time.now.utc > Time.new(2020,12,1,7,0,0,"+00:00"))
 	currentWeek = 14
 elsif (Time.now.utc > Time.new(2020,11,24,7,0,0,"+00:00"))
 	currentWeek = 13

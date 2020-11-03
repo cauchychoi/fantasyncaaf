@@ -36,7 +36,9 @@ end
 
 # Get the next week's schedule (set to the Sunday before the week)
 task :update_gametimes do
-	if (Time.now.utc > Time.new(2020,11,29,7,0,0,"+00:00") && Time.now.utc < Time.new(2020,12,6,7,0,0,"+00:00"))
+	if (Time.now.utc > Time.new(2020,12,6,7,0,0,"+00:00") && Time.now.utc < Time.new(2020,12,13,7,0,0,"+00:00"))
+		ruby "get_schedule.rb 15 15"
+	elsif (Time.now.utc > Time.new(2020,11,29,7,0,0,"+00:00"))
 		ruby "get_schedule.rb 14 14"
 	elsif (Time.now.utc > Time.new(2020,11,22,7,0,0,"+00:00"))
 		ruby "get_schedule.rb 13 13"
