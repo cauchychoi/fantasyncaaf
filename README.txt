@@ -11,6 +11,7 @@ To reset a season:
 	Update currentWeek in updateTimesPlayerUsed.rb
 	Update currentWeek in update_leaguestandings.rb
 	Update currentWeek in lib/tasks/scheduler.rake
+	Comment out bonus game logic in updateTimesPlayerUsed.rb
 
 To upload to github:
 	git add . (in the context of your current folder)

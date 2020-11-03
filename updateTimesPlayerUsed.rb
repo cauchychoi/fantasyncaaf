@@ -45,16 +45,16 @@ client.query("select distinct C.playerID, C.fantasyID, C.teamID, C.position, C.h
 			if (player["hasPlayed"] == 0)				
 				if (player["position"].eql?("DEF"))
 					unless defenseProcessed.include?(player["fantasyID"])
-						if !(currentWeek == 12 && (player["fantasyID"] == 101 || player["fantasyID"] == 151))  # Bonus game logic, won't run in week 12 for Cauchy and Channing
+#						if !(currentWeek == 12 && (player["fantasyID"] == 101 || player["fantasyID"] == 151))  # Bonus game logic, won't run in week 12 for Cauchy and Channing
 							client.query("INSERT INTO timesplayerused (playerID, teamID, timesUsed) VALUES ("+player["teamID"].to_s+", "+player["fantasyID"].to_s+", 1) ON DUPLICATE KEY UPDATE timesUsed=timesUsed+1")
-						end
+#						end
 						client.query("UPDATE teamroster set hasPlayed = 1 where week = "+currentWeek.to_s+" and teamID = "+player["fantasyID"].to_s+" and position = \""+player["position"]+"\"")
 						defenseProcessed.push(player["fantasyID"])
 					end
 				else
-					if !(currentWeek == 12 && (player["fantasyID"] == 101 || player["fantasyID"] == 151))  # Bonus game logic, won't run in week 12 for Cauchy and Channing
+#					if !(currentWeek == 12 && (player["fantasyID"] == 101 || player["fantasyID"] == 151))  # Bonus game logic, won't run in week 12 for Cauchy and Channing
 						client.query("INSERT INTO timesplayerused (playerID, teamID, timesUsed) VALUES ("+player["playerID"].to_s+", "+player["fantasyID"].to_s+", 1) ON DUPLICATE KEY UPDATE timesUsed=timesUsed+1")
-					end
+#					end
 					client.query("UPDATE teamroster set hasPlayed = 1 where week = "+currentWeek.to_s+" and teamID = "+player["fantasyID"].to_s+" and position = \""+player["position"]+"\"")
 				end
 			end
