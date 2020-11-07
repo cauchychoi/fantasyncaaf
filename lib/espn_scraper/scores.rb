@@ -382,34 +382,37 @@ module ESPN
       end
 	  
 	  def get_gameTimes(doc, week)
-        weekSchedule = []
-		games = []
-		espn_regex = /window\.espn\.scoreboardData \t= (\{.*?\});/
-        doc.xpath("//script").each do |script_section|
-          if script_section.content =~ espn_regex
-            espn_data = JSON.parse(espn_regex.match(script_section.content)[1])
-            games = espn_data['events']
-            break
-          end
+      weekSchedule = []
+		  games = []
+		  espn_regex = /window\.espn\.scoreboardData \t= (\{.*?\});/
+      doc.xpath("//script").each do |script_section|
+        if script_section.content =~ espn_regex
+          espn_data = JSON.parse(espn_regex.match(script_section.content)[1])
+          games = espn_data['events']
+          break
         end
-        games.each do |game|
+      end
+      games.each do |game|
 		  
-		  # gameID
-		  uidLong = game['uid']
-		  uidShort = uidLong[-9..-1]
+  		  # gameID
+  		  uidLong = game['uid']
+  		  uidShort = uidLong[-9..-1]
 		  
-          competition = game['competitions'].first
+        competition = game['competitions'].first
 		  
-		  dateTime = DateTime.parse(competition['startDate'])
-		  dateTime = dateTime.strftime('%Y-%m-%d %H:%M:%S') #formatting for MySQL
+		    dateTime = DateTime.parse(competition['startDate'])
+		    dateTime = dateTime.strftime('%Y-%m-%d %H:%M:%S') #formatting for MySQL
 		  
-		  teams = competition['competitors']
-		  teams.each do |team|
-			displayName = team['team']['displayName']
-			displayName.slice!(team['team']['shortDisplayName'])  #isolate school name. e.g. displayName = USC Trojans, shortDisplayName = Trojans
-			displayName = displayName.strip
-			weekSchedule.push({:teamID => team['id'], :gameID => uidShort, :week => week, :team => displayName, :gametime => dateTime, :homeAway => team['homeAway']})
-		  end
+		    teams = competition['competitors']
+		    teams.each do |team|
+			    displayName = team['team']['displayName']
+			    displayName.slice!(team['team']['shortDisplayName'])  #isolate school name. e.g. displayName = USC Trojans, shortDisplayName = Trojans
+			    displayName = displayName.strip
+          puts competition['status']['type']['name']
+          if competition['status']['type']['name'] != "STATUS_CANCELED"
+			      weekSchedule.push({:teamID => team['id'], :gameID => uidShort, :week => week, :team => displayName, :gametime => dateTime, :homeAway => team['homeAway']})
+		      end
+        end
 		 
           #date = date.new_offset('-08:00') #convert from GMT to PST
           
