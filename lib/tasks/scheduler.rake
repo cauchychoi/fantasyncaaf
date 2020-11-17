@@ -29,7 +29,7 @@ task :test_update_scores do
 end
 
 task :update_leaguestandings do
-	if Time.now.utc.wday == 1 && (Time.new(2020,9,6,7,0,0,"+00:00")..Time.new(2020,11,8,7,0,0,"+00:00")).cover?(Time.now.utc)
+	if Time.now.utc.wday == 1 && (Time.new(2020,9,6,7,0,0,"+00:00")..Time.new(2020,12,15,7,0,0,"+00:00")).cover?(Time.now.utc)
 		ruby "update_leaguestandings.rb"
 	end
 end
