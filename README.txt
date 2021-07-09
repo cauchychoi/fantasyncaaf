@@ -5,12 +5,13 @@ To reset a season:
 	truncate teamroster
 	truncate timesplayerused
 	truncate leaguestandings
+	truncate gametimes
 	Manually modify matchupschedule
 	Manually modify divisions (if necessary)
 	Change get_schedule.rb to current year
-	Update currentWeek in updateTimesPlayerUsed.rb
-	Update currentWeek in update_leaguestandings.rb
-	Update currentWeek in lib/tasks/scheduler.rake
+	Update tuesdayAfterWeek1 in updateTimesPlayerUsed.rb
+	Update sundayAfterWeek2 in update_leaguestandings.rb
+	Update sundayBeforeWeek1 in lib/tasks/scheduler.rake
 	Comment out bonus game logic in updateTimesPlayerUsed.rb
 
 To upload to github:
@@ -28,7 +29,7 @@ Currently set to Pac12 only using an IF statement to filter the teams in get_ros
 To refresh the season schedule, run:
 	ruby get_schedule.rb <weekRangeStart> <weekRangeEnd>
 Configurations in ESPN.get_schedule():
-	Year (Current = 2018)
+	Year (Current = 2021)
 	Conference (Pac12 = 9)
 	#week (configurable for loop)
 	
