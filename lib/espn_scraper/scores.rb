@@ -408,7 +408,7 @@ module ESPN
 			    displayName = team['team']['displayName']
 			    displayName.slice!(team['team']['shortDisplayName'])  #isolate school name. e.g. displayName = USC Trojans, shortDisplayName = Trojans
 			    displayName = displayName.strip
-          puts competition['status']['type']['name']
+          #puts competition['status']['type']['name']
           if competition['status']['type']['name'] != "STATUS_CANCELED"
 			      weekSchedule.push({:teamID => team['id'], :gameID => uidShort, :week => week, :team => displayName, :gametime => dateTime, :homeAway => team['homeAway']})
 		      end
