@@ -36,37 +36,40 @@ end
 
 # Get the next week's schedule (set to the Sunday before the week)
 task :update_gametimes do
-	if (Time.now.utc > Time.new(2020,12,13,7,0,0,"+00:00") && Time.now.utc < Time.new(2020,12,20,7,0,0,"+00:00"))
+	sundayBeforeWeek1 = Time.new(2021,8,29,7,0,0,"+00:00"))
+	weekInSeconds = 7*24*60*60
+
+	if (Time.now.utc > (sundayBeforeWeek1 + (15 * weekInSeconds)) && Time.now.utc < (sundayBeforeWeek1 + (16 * weekInSeconds)))
 		ruby "get_schedule.rb 16 16"
-	elsif (Time.now.utc > Time.new(2020,12,6,7,0,0,"+00:00"))
+	elsif (Time.now.utc > (sundayBeforeWeek1 + (14 * weekInSeconds)))
 		ruby "get_schedule.rb 15 15"
-	elsif (Time.now.utc > Time.new(2020,11,29,7,0,0,"+00:00"))
+	elsif (Time.now.utc > (sundayBeforeWeek1 + (13 * weekInSeconds)))
 		ruby "get_schedule.rb 14 14"
-	elsif (Time.now.utc > Time.new(2020,11,22,7,0,0,"+00:00"))
+	elsif (Time.now.utc > (sundayBeforeWeek1 + (12 * weekInSeconds)))
 		ruby "get_schedule.rb 13 13"
-	elsif (Time.now.utc > Time.new(2020,11,15,7,0,0,"+00:00")) 
+	elsif (Time.now.utc > (sundayBeforeWeek1 + (11 * weekInSeconds))) 
 		ruby "get_schedule.rb 12 12"
-	elsif (Time.now.utc > Time.new(2020,11,8,7,0,0,"+00:00")) 
+	elsif (Time.now.utc > (sundayBeforeWeek1 + (10 * weekInSeconds))) 
 		ruby "get_schedule.rb 11 11"
-	elsif (Time.now.utc > Time.new(2020,11,1,7,0,0,"+00:00")) 
+	elsif (Time.now.utc > (sundayBeforeWeek1 + (9 * weekInSeconds))) 
 		ruby "get_schedule.rb 10 10"
-	elsif (Time.now.utc > Time.new(2020,10,25,7,0,0,"+00:00")) 
+	elsif (Time.now.utc > (sundayBeforeWeek1 + (8 * weekInSeconds))) 
 		ruby "get_schedule.rb 9 9"
-	elsif (Time.now.utc > Time.new(2020,10,18,7,0,0,"+00:00")) 
+	elsif (Time.now.utc > (sundayBeforeWeek1 + (7 * weekInSeconds))) 
 		ruby "get_schedule.rb 8 8"
-	elsif (Time.now.utc > Time.new(2020,10,11,7,0,0,"+00:00")) 
+	elsif (Time.now.utc > (sundayBeforeWeek1 + (6 * weekInSeconds))) 
 		ruby "get_schedule.rb 7 7"
-	elsif (Time.now.utc > Time.new(2020,10,4,7,0,0,"+00:00")) 
+	elsif (Time.now.utc > (sundayBeforeWeek1 + (5 * weekInSeconds))) 
 		ruby "get_schedule.rb 6 6"
-	elsif (Time.now.utc > Time.new(2020,9,27,7,0,0,"+00:00")) 
+	elsif (Time.now.utc > (sundayBeforeWeek1 + (4 * weekInSeconds))) 
 		ruby "get_schedule.rb 5 5"
-	elsif (Time.now.utc > Time.new(2020,9,20,7,0,0,"+00:00")) 
+	elsif (Time.now.utc > (sundayBeforeWeek1 + (3 * weekInSeconds)))
 		ruby "get_schedule.rb 4 4"
-	elsif (Time.now.utc > Time.new(2020,9,13,7,0,0,"+00:00"))
+	elsif (Time.now.utc > (sundayBeforeWeek1 + (2 * weekInSeconds)))
 		ruby "get_schedule.rb 3 3"
-	elsif (Time.now.utc > Time.new(2020,9,6,7,0,0,"+00:00"))
+	elsif (Time.now.utc > (sundayBeforeWeek1 + weekInSeconds))
 		ruby "get_schedule.rb 2 2"
-	elsif (Time.now.utc > Time.new(2020,8,30,7,0,0,"+00:00"))
+	elsif (Time.now.utc > sundayBeforeWeek1)
 		ruby "get_schedule.rb 1 1"
 	end	
 end

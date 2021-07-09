@@ -3,37 +3,40 @@
 require 'mysql2'
 require 'time'
 
-# Week is set before games are played
+# Week is set on Tuesday before games are played
+tuesdayAfterWeek1 = Time.new(2021,9,7,7,0,0,"+00:00"))
+weekInSeconds = 7*24*60*60
+
 currentWeek = 1
-if (Time.now.utc > Time.new(2020,12,15,7,0,0,"+00:00"))
+if (Time.now.utc > (tuesdayAfterWeek1 + (14 * weekInSeconds)))
 	currentWeek = 16
-elsif (Time.now.utc > Time.new(2020,12,8,7,0,0,"+00:00"))
+elsif (Time.now.utc > (tuesdayAfterWeek1 + (13 * weekInSeconds)))
 	currentWeek = 15
-elsif (Time.now.utc > Time.new(2020,12,1,7,0,0,"+00:00"))
+elsif (Time.now.utc > (tuesdayAfterWeek1 + (12 * weekInSeconds)))
 	currentWeek = 14
-elsif (Time.now.utc > Time.new(2020,11,24,7,0,0,"+00:00"))
+elsif (Time.now.utc > (tuesdayAfterWeek1 + (11 * weekInSeconds)))
 	currentWeek = 13
-elsif (Time.now.utc > Time.new(2020,11,17,7,0,0,"+00:00"))
+elsif (Time.now.utc > (tuesdayAfterWeek1 + (10 * weekInSeconds)))
 	currentWeek = 12;
-elsif (Time.now.utc > Time.new(2020,11,10,7,0,0,"+00:00")) 
+elsif (Time.now.utc > (tuesdayAfterWeek1 + (9 * weekInSeconds))) 
 	currentWeek = 11;
-elsif (Time.now.utc > Time.new(2020,11,3,7,0,0,"+00:00")) 
+elsif (Time.now.utc > (tuesdayAfterWeek1 + (8 * weekInSeconds))) 
 	currentWeek = 10;
-elsif (Time.now.utc > Time.new(2020,10,27,7,0,0,"+00:00")) 
+elsif (Time.now.utc > (tuesdayAfterWeek1 + (7 * weekInSeconds))) 
 	currentWeek = 9;
-elsif (Time.now.utc > Time.new(2020,10,20,7,0,0,"+00:00")) 
+elsif (Time.now.utc > (tuesdayAfterWeek1 + (6 * weekInSeconds)))
 	currentWeek = 8;
-elsif (Time.now.utc > Time.new(2020,10,13,7,0,0,"+00:00")) 
+elsif (Time.now.utc > (tuesdayAfterWeek1 + (5 * weekInSeconds)))
 	currentWeek = 7;
-elsif (Time.now.utc > Time.new(2020,10,6,7,0,0,"+00:00")) 
+elsif (Time.now.utc > (tuesdayAfterWeek1 + (4 * weekInSeconds)))
 	currentWeek = 6;
-elsif (Time.now.utc > Time.new(2020,9,29,7,0,0,"+00:00")) 
+elsif (Time.now.utc > (tuesdayAfterWeek1 + (3 * weekInSeconds)))
 	currentWeek = 5;
-elsif (Time.now.utc > Time.new(2020,9,22,7,0,0,"+00:00")) 
+elsif (Time.now.utc > (tuesdayAfterWeek1 + (2 * weekInSeconds)))
 	currentWeek = 4;
-elsif (Time.now.utc > Time.new(2020,9,15,7,0,0,"+00:00")) 
+elsif (Time.now.utc > (tuesdayAfterWeek1 + weekinSeconds))
 	currentWeek = 3;
-elsif (Time.now.utc > Time.new(2020,9,8,7,0,0,"+00:00"))
+elsif (Time.now.utc > tuesdayAfterWeek1)
 	currentWeek = 2;
 end
 
