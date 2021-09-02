@@ -67,3 +67,10 @@ brew install postgresql
 
 gem install bundler
 bundle install
+
+Credentials in git:
+https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git
+
+brew install git
+brew tap microsoft/git
+brew install --cask git-credential-manager-core
