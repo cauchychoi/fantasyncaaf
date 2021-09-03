@@ -34,7 +34,7 @@ elsif (Time.now.utc > (tuesdayAfterWeek1 + (3 * weekInSeconds)))
 	currentWeek = 5;
 elsif (Time.now.utc > (tuesdayAfterWeek1 + (2 * weekInSeconds)))
 	currentWeek = 4;
-elsif (Time.now.utc > (tuesdayAfterWeek1 + weekinSeconds))
+elsif (Time.now.utc > (tuesdayAfterWeek1 + weekInSeconds))
 	currentWeek = 3;
 elsif (Time.now.utc > tuesdayAfterWeek1)
 	currentWeek = 2;
