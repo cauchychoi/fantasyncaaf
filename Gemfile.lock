@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/cauchychoi/fantasyncaaf.git
-  revision: ab78bd58499ca4d91d285e28dac328c93fd80d57
+  revision: 45d89911e6f168063d258d594120ae6f7ea493ab
   specs:
-    espn_scraper (1.5.1)
+    espn_scraper (1.5.2)
       httparty
       nokogiri
 
@@ -35,7 +35,7 @@ PLATFORMS
 
 DEPENDENCIES
   dbi
-  espn_scraper (>= 1.5.1)!
+  espn_scraper (>= 1.5.2)!
   httparty
   minitest (~> 5.6.0)
   mysql2 (~> 0.5.2)
