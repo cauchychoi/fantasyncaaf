@@ -4,7 +4,7 @@ require 'mysql2'
 require 'time'
 
 # Week is set on Tuesday before games are played
-tuesdayAfterWeek1 = Time.new(2021,9,7,7,0,0,"+00:00"))
+tuesdayAfterWeek1 = Time.new(2021,9,7,7,0,0,"+00:00")
 weekInSeconds = 7*24*60*60
 currentWeek = 1
 
