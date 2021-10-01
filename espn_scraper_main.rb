@@ -165,7 +165,7 @@ end
 #client.query("delete from defensestats where week=#{i}")
 #client.query("delete from kickerstats where week=#{i}")
 
-weeklyStats = ESPN.get_pac12_game(2019, ARGV[0], Array(ARGV[1]))  # REAL THING
+weeklyStats = ESPN.get_pac12_game(2021, ARGV[0], Array(ARGV[1]))  # REAL THING
 #weeklyStats = ESPN.get_mw_game(2018, ARGV[0], Array(ARGV[1]))  # 8/25 test
 #weeklyStats = ESPN.get_pac12_games(2017, i)  # TODO: parameters should be year, week, gameID
 fantasyPoints = calculateScores(weeklyStats, client)
@@ -299,7 +299,7 @@ end
 offenseQuery += " ON DUPLICATE KEY UPDATE week=VALUES(week), playerID=VALUES(playerID), fantasyPoints=VALUES(fantasyPoints)"
 defenseQuery += " ON DUPLICATE KEY UPDATE week=VALUES(week), teamID=VALUES(teamID), fantasyPoints=VALUES(fantasyPoints)"
 
-puts offenseQuery
+#puts offenseQuery
 client.query(offenseQuery)
 client.query(defenseQuery)
 

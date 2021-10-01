@@ -38,7 +38,7 @@ DEPENDENCIES
   espn_scraper (>= 1.5.2)!
   httparty
   minitest (~> 5.6.0)
-  mysql2 (= 0.5.2)
+  mysql2 (~> 0.5.2)
   nokogiri (>= 1.10.8)
   pg
   rake (>= 12.3.3)
