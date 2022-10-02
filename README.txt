@@ -46,16 +46,21 @@ For testing score scraping:
 	ruby espn_scraper_main.rb <week> <gameID>
 
 For MAC:
-xcode-select --install
+git clone https://github.com/cauchychoi/fantasyncaaf
 
-ruby -e "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/master/install)"
+//xcode-select --install
+
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
 brew update
 brew install rbenv
 echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
 source ~/.bash_profile
 
-rbenv install 2.5.6
+CFLAGS="-Wno-error=implicit-function-declaration" RUBY_CONFIGURE_OPTS='--with-readline-dir=/usr/local/opt/readline/' arch -x86_64 rbenv install 2.5.6
+export PATH="$HOME/.rbenv/bin:$PATH"
+eval "$(rbenv init -)"
 rbenv global 2.5.6
+export GEM_HOME="$HOME/.gem"
 gem install rails --no-document
 
 //brew install openssl
@@ -64,7 +69,10 @@ ln -sfn /usr/local/Cellar/openssl@1.0/1.0.2t /usr/local/opt/openssl
 export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/opt/openssl/lib/
 bundle config --local build.mysql2 "--with-ldflags=-L/usr/local/opt/openssl/lib --with-cppflags=-I/usr/local/opt/openssl/include"
 
-brew install postgresql
+brew install mysql
+brew install libpq
+export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+//brew install postgresql
 
 gem install bundler
 bundle install
