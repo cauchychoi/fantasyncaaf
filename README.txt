@@ -30,7 +30,7 @@ Currently set to Pac12 only using an IF statement to filter the teams in get_ros
 To refresh the season schedule, run:
 	ruby get_schedule.rb <weekRangeStart> <weekRangeEnd>
 Configurations in ESPN.get_schedule():
-	Year (Current = 2021)
+	Year (Current = 2023)
 	Conference (Pac12 = 9)
 	#week (configurable for loop)
 	
@@ -39,8 +39,8 @@ To refresh league standings, run:
 	
 If changes are made to scores.rb:
 	gem build espn_scraper.gemspec
-	gem install espn_scraper-1.5.1.gem
-Before pushing to github/heroku, remove espn_scraper-1.5.1.gem from the folder
+	gem install espn_scraper-1.5.3.gem
+Before pushing to github/heroku, remove espn_scraper-1.5.3.gem from the folder
 
 For testing score scraping:
 	ruby espn_scraper_main.rb <week> <gameID>
