@@ -72,7 +72,8 @@ bundle config --local build.mysql2 "--with-ldflags=-L/usr/local/opt/openssl/lib 
 brew install mysql
 brew install libpq
 export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
-//brew install postgresql
+brew tap homebrew/core
+brew install postgresql
 
 gem install bundler
 bundle install

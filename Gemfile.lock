@@ -1,8 +1,8 @@
 GIT
   remote: https://github.com/cauchychoi/fantasyncaaf.git
-  revision: 45d89911e6f168063d258d594120ae6f7ea493ab
+  revision: cbfd67ece1480ed6808c97fe3286b5938a1a48ec
   specs:
-    espn_scraper (1.5.2)
+    espn_scraper (1.5.3)
       httparty
       nokogiri
 
@@ -35,7 +35,7 @@ PLATFORMS
 
 DEPENDENCIES
   dbi
-  espn_scraper (>= 1.5.2)!
+  espn_scraper (>= 1.5.3)!
   httparty
   minitest (~> 5.6.0)
   mysql2 (~> 0.5.2)
@@ -44,7 +44,7 @@ DEPENDENCIES
   rake (>= 12.3.3)
 
 RUBY VERSION
-   ruby 2.5.6p201
+   ruby 2.7.0p0
 
 BUNDLED WITH
-   2.0.2
+   2.4.19
