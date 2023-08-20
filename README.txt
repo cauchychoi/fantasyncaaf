@@ -63,9 +63,9 @@ rbenv global 2.5.6
 export GEM_HOME="$HOME/.gem"
 gem install rails --no-document
 
-//brew install openssl
-brew install rbenv/tap/openssl@1.0
-ln -sfn /usr/local/Cellar/openssl@1.0/1.0.2t /usr/local/opt/openssl
+brew install openssl
+//brew install rbenv/tap/openssl@1.0
+ln -sfn /usr/local/Cellar/openssl3/3.1.2 /usr/local/opt/openssl (// openssl@1.0/1.0.2t)
 export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/opt/openssl/lib/
 bundle config --local build.mysql2 "--with-ldflags=-L/usr/local/opt/openssl/lib --with-cppflags=-I/usr/local/opt/openssl/include"
 
