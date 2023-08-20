@@ -29,14 +29,14 @@ task :test_update_scores do
 end
 
 task :update_leaguestandings do
-	if Time.now.utc.wday == 1 && (Time.new(2022,9,5,7,0,0,"+00:00")..Time.new(2022,11,21,7,0,0,"+00:00")).cover?(Time.now.utc)
+	if Time.now.utc.wday == 1 && (Time.new(2023,9,4,7,0,0,"+00:00")..Time.new(2023,11,20,7,0,0,"+00:00")).cover?(Time.now.utc)
 		ruby "update_leaguestandings.rb"
 	end
 end
 
 # Get the next week's schedule (set to the Sunday before the week)
 task :update_gametimes do
-	sundayBeforeWeek1 = Time.new(2022,8,28,7,0,0,"+00:00")
+	sundayBeforeWeek1 = Time.new(2023,8,20,7,0,0,"+00:00")
 	weekInSeconds = 7*24*60*60
 
 	if (Time.now.utc > (sundayBeforeWeek1 + (15 * weekInSeconds)) && Time.now.utc < (sundayBeforeWeek1 + (16 * weekInSeconds)))
