@@ -20,11 +20,11 @@
 # Learn more: http://github.com/javan/whenever
 
 every 1.minute do
-	rake 'scheduler:update_scores'
+	rake 'update_scores'
 end
 
 every 1.day, at: '3:00 am' do
-	rake 'scheduler:update_leaguestandings'
+	rake 'update_leaguestandings'
 end
 
 # every 1.day, at: '4:00 am' do
@@ -32,5 +32,5 @@ end
 # end
 
 every 1.day, at: '5:00 am' do
-	rake 'scheduler:update_collegeteamroster'
+	rake 'update_collegeteamroster'
 end
