@@ -56,10 +56,10 @@ brew install rbenv
 echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
 source ~/.bash_profile
 
-CFLAGS="-Wno-error=implicit-function-declaration" RUBY_CONFIGURE_OPTS='--with-readline-dir=/usr/local/opt/readline/' arch -x86_64 rbenv install 2.5.6
+CFLAGS="-Wno-error=implicit-function-declaration" RUBY_CONFIGURE_OPTS='--with-readline-dir=/usr/local/opt/readline/' arch -x86_64 rbenv install 2.7.0
 export PATH="$HOME/.rbenv/bin:$PATH"
 eval "$(rbenv init -)"
-rbenv global 2.5.6
+rbenv global 2.7.0
 export GEM_HOME="$HOME/.gem"
 gem install rails --no-document
 
@@ -84,3 +84,7 @@ https://docs.github.com/en/get-started/getting-started-with-git/caching-your-git
 brew install git
 brew tap microsoft/git
 brew install --cask git-credential-manager
+
+To update cronjob:
+Modify config/schedule.rb
+whenever --update-crontab

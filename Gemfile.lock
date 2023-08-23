@@ -9,6 +9,7 @@ GIT
 GEM
   remote: https://rubygems.org/
   specs:
+    chronic (0.10.2)
     dbi (0.4.5)
       deprecated (= 2.0.1)
     deprecated (2.0.1)
@@ -28,6 +29,8 @@ GEM
     pg (1.0.0-x64-mingw32)
     racc (1.5.2)
     rake (13.0.6)
+    whenever (1.0.0)
+      chronic (>= 0.6.3)
 
 PLATFORMS
   ruby
@@ -42,6 +45,7 @@ DEPENDENCIES
   nokogiri (>= 1.10.8)
   pg
   rake (>= 12.3.3)
+  whenever
 
 RUBY VERSION
    ruby 2.7.0p0
