@@ -12,7 +12,7 @@
 # limitations under the License.
 
 # [START fantasyncaaf_app_yaml]
-runtime: ruby25
+runtime: ruby27
 entrypoint: bundle exec rackup -p $PORT
 instance_class: F2
 # [END fantasyncaaf_app_yaml]
