@@ -165,7 +165,7 @@ end
 #client.query("delete from defensestats where week=#{i}")
 #client.query("delete from kickerstats where week=#{i}")
 
-weeklyStats = ESPN.get_pac12_game(2021, ARGV[0], Array(ARGV[1]))  # REAL THING
+weeklyStats = ESPN.get_pac12_game(2023, ARGV[0], Array(ARGV[1]))  # REAL THING
 #weeklyStats = ESPN.get_mw_game(2018, ARGV[0], Array(ARGV[1]))  # 8/25 test
 #weeklyStats = ESPN.get_pac12_games(2017, i)  # TODO: parameters should be year, week, gameID
 fantasyPoints = calculateScores(weeklyStats, client)
