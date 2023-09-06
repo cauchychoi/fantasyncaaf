@@ -50,7 +50,7 @@ git clone https://github.com/cauchychoi/fantasyncaaf
 
 //xcode-select --install
 
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"    // follow instructions after install to add Homebrew to PATH
 brew update
 brew install rbenv
 echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
