@@ -985,6 +985,7 @@ module ESPN
                   	awaySackYardage += sackYards
                   else
                   	homeSackYardage += sackYards
+                  end
 								end
 							end
 						end
