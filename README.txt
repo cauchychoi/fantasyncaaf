@@ -48,11 +48,9 @@ For testing score scraping:
 For MAC:
 git clone https://github.com/cauchychoi/fantasyncaaf
 
-//xcode-select --install
-
-/bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"
+arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"    // follow instructions after install to add Homebrew to PATH
 brew update
-brew install rbenv
+arch -x86_64 brew install rbenv
 echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
 source ~/.bash_profile
 
@@ -63,17 +61,17 @@ rbenv global 2.7.0
 export GEM_HOME="$HOME/.gem"
 gem install rails --no-document
 
-brew install openssl
-//brew install rbenv/tap/openssl@1.0
-ln -sfn /usr/local/Cellar/openssl3/3.1.2 /usr/local/opt/openssl (// openssl@1.0/1.0.2t)
+arch -x86_64 brew install openssl
+ln -sfn /usr/local/Cellar/openssl3/3.1.2 /usr/local/opt/openssl 
 export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/opt/openssl/lib/
 bundle config --local build.mysql2 "--with-ldflags=-L/usr/local/opt/openssl/lib --with-cppflags=-I/usr/local/opt/openssl/include"
 
-brew install mysql
-brew install libpq
-export PATH="/opt/homebrew/opt/libpq/bin:$PATH"
+arch -x86_64 brew install mysql
+arch -x86_64 brew install libpq
+echo 'export PATH="/usr/local/opt/libpq/bin:$PATH"' >> ~/.bash_profile
 brew tap homebrew/core
-brew install postgresql
+gem install pg -v '1.0.0' -- --with-pg-config=/usr/local/opt/libpq/bin/pg_config
+//brew install postgresql
 
 gem install bundler
 bundle install
