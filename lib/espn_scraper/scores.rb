@@ -928,6 +928,8 @@ module ESPN
 			doc = ESPN.get 'scores', 'college-football', "game?gameId=#{page}"
 			awayTeamId = ""
 			homeTeamId = ""
+			awayTeamDisplayName = ""
+			homeTeamDisplayName = ""
 			stat = {}
 			
 =begin old team IDs
@@ -954,7 +956,9 @@ module ESPN
 				if script_section.content =~ espn_regex
 					espn_data = JSON.parse(espn_regex.match(script_section.content)[1])
 					awayTeamId = espn_data['page']['content']['gamepackage']['shtChrt']['tms']['away']['id']
+					awayTeamDisplayName = espn_data['page']['content']['gamepackage']['shtChrt']['tms']['away']['displayName']
 					homeTeamId = espn_data['page']['content']['gamepackage']['shtChrt']['tms']['home']['id']
+					homeTeamDisplayName = espn_data['page']['content']['gamepackage']['shtChrt']['tms']['home']['displayName']
 					#puts espn_data.size
 					#plays = espn_data[1]['play']
 					
@@ -971,6 +975,21 @@ module ESPN
 						longTouchdowns = {}
 						longTouchdownsDefense = {}
 						fieldGoals = {}
+
+						espn_data['page']['content']['gamepackage']['allPlys'].each do |playGroup|
+							playGroup['plays'].each do |play|
+								if play['description'].to_s.downcase.include?("sack")
+									tempText = play['description'].to_s.downcase
+                  sackYards = tempText[/(\w+)(?=\s*( yd| yard))/].to_i  # Get first instance of <xx> yards or yds (?= vs ?!)
+                  if playGroup['teamName'].to_s.eql?(homeTeamDisplayName)
+                  	awaySackYardage += sackYards
+                  else
+                  	homeSackYardage += sackYards
+								end
+							end
+						end
+
+
 						espn_data['page']['content']['gamepackage']['scrSumm']['scrPlayGrps'].each do |group|
 						#espn_data.each do |group|
 							group.each do |playStats|
@@ -1044,7 +1063,7 @@ module ESPN
 											elsif playStats['teamId'].to_s.eql?(awayTeamId)
 												homeSafeties += 1 #flipped because the other team gets the points
 											end
-										
+=begin old sack yards										
 										elsif playStats['type']['id'].to_s.eql?("7") || playStats['type']['id'].to_s.eql?("9") || playStats['type']['id'].to_s.eql?("29") #7 = Sack, 9 = Fumble Recovery (Own), 29 = Fumble Recovery (Opponent)
 											if playStats['text'].to_s.downcase.include?("sack")
 												tempText = playStats['text'].to_s.downcase
@@ -1055,11 +1074,12 @@ module ESPN
 													homeSackYardage += sackYards
 												end
 											end
-										
+=end										
 										
 										#52 = Punt, 37 = Blocked Punt Touchdown, 67 = Passing Touchdown  68 = Rushing Touchdown, 32 = Kickoff Return TD, 34 = Punt Ret TD, 38 = Blocked FG TD, 39 = Fumble Ret TD, 36 = Interception Return TD
 										#elsif (playStats['type']['id'].to_s.eql?("52") && (playStats['text'].to_s.downcase.include?("td") || playStats['text'].to_s.downcase.include?("touchdown"))) || playStats['type']['id'].to_s.eql?("37") || playStats['type']['id'].to_s.eql?("67") || playStats['type']['id'].to_s.eql?("68") || playStats['type']['id'].to_s.eql?("32") || playStats['type']['id'].to_s.eql?("34") || playStats['type']['id'].to_s.eql?("39") || playStats['type']['id'].to_s.eql?("39") || playStats['type']['id'].to_s.eql?("36")
 										elsif playStats['typeAbbreviation'] == "TD"
+=begin I believe the logic above should account for the sack yardage on fumble ret TD											
 											# Account for potential sack yardage on fumble ret TD
 											#if playStats['type']['id'].to_s.eql?("39")
 												if playStats['text'].to_s.downcase.include?("sack")
@@ -1073,7 +1093,7 @@ module ESPN
 													end
 												end
 											#end
-											
+=end
 											
 											patString = playStats['text'][/\(.*?\)/].to_s    #get string after TD between parentheses (should be PAT text)
 											touchdownString = playStats['text'][/^([^\(])+/].to_s  #get string before the parentheses (should be TD text)
