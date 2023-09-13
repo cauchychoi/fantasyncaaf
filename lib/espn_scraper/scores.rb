@@ -1236,8 +1236,8 @@ module ESPN
 											elsif playStats['teamId'].to_s.eql?(awayTeamId)
 												home2ptReturnPAT += 1 #flipped because the other team gets the points
 											end
-										end
 =end
+										end
 									#end  # unless playStats.nil?
 								#end   
 							end 
