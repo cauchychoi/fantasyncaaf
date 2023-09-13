@@ -689,7 +689,7 @@ module ESPN
 										team1Sacks += teamstats['ttls'][2].to_i
 										team1DefensiveTDs += teamstats['ttls'][6].to_i
 									elsif !team['tm']['hm']
-										team0sacks += teamstats['ttls'][2].to_i
+										team0Sacks += teamstats['ttls'][2].to_i
 										team0DefensiveTDs += teamstats['ttls'][6].to_i
 									end
 									teamstats['athlts'].each do |player|
