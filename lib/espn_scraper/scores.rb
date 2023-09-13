@@ -616,9 +616,9 @@ module ESPN
 									end
 								elsif teamstats['type'] == "rushing"
 									if team['tm']['hm']
-										team0ydsAllowed += teamstats['ttls'][1].to_i
+										team0YdsAllowed += teamstats['ttls'][1].to_i
 									elsif !team['tm']['hm']
-										team1ydsAllowed += teamstats['ttls'][1].to_i
+										team1YdsAllowed += teamstats['ttls'][1].to_i
 									end
 									teamstats['athlts'].each do |player|
 										stat = {}
@@ -635,9 +635,9 @@ module ESPN
 									end
 								elsif teamstats['type'] == "receiving"
 									if team['tm']['hm']
-										team0ydsallowed += teamstats['ttls'][1].to_i
+										team0YdsAllowed += teamstats['ttls'][1].to_i
 									elsif !team['tm']['hm']
-										team1ydsallowed += teamstats['ttls'][1].to_i
+										team1YdsAllowed += teamstats['ttls'][1].to_i
 									end
 									teamstats['athlts'].each do |player|
 										stat = {}
