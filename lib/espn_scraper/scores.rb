@@ -526,7 +526,8 @@ module ESPN
 			#REAL CODE
 			pages.each { |page|
 				html = ESPN.get 'scores', 'college-football', "boxscore?gameId=#{page}"
-			
+
+=begin old getTeamIDs			
 				#Get Team IDs
 				awayTeamId = ""
 				homeTeamId = ""
@@ -543,7 +544,8 @@ module ESPN
 						homeTeamId = JSON.parse(homeTeamIdRegex.match(script_section.content)[1])
 					end
 				end
-			
+=end
+
 				# Variables for defense. team0 = away, team1 = home
 				teamCount = 0
 				teamNames = []
@@ -575,13 +577,31 @@ module ESPN
 				html.xpath("//script").each do |script_section|
 					if script_section.content =~ espn_regex
 						espn_data = JSON.parse(espn_regex.match(script_section.content)[1])
-						#espn_data['page']['content']['cmpttn']
+						
+						#Get Team IDs and final scores
+						espn_data['page']['content']['gamepackage']['gmStrp']['tms'].each do |teamInfo|
+							if teamInfo['isHome']
+								homeTeamId = teamInfo['id']
+								finalScores[0] = teamInfo['score']
+							elsif !teamInfo['isHome']
+								awayTeamId = teamInfo['id']
+								finalScores[1] = teamInfo['score']
+							end
+						end
+
 						espn_data['page']['content']['gamepackage']['bxscr'].each do |team|
+							teamName = team['tm']['nm']
+							if team['tm']['hm']
+								teamNames[1] = team['tm']['nm']
+							elsif !team['tm']['hm']
+								teamNames[0] = team['tm']['nm']
+							end
 							team['stats'].each do |teamstats|
 								if teamstats['type'] == "passing"
 									teamstats['athlts'].each do |player|
 										stat = {}
 										stat[:week] = week
+										stat[:teamName] = teamName
 										stat[:playerName] = player['athlt']['dspNm']
 										stat[:playerID] = player['athlt']['id']
 										# Passing stat order: ["completions/passingAttempts", "passingYards", "yardsPerPassAttempt", "passingTouchdowns", "interceptions", "adjQBR"]
@@ -595,6 +615,11 @@ module ESPN
 		  							end
 									end
 								elsif teamstats['type'] == "rushing"
+									if team['tm']['hm']
+										team0ydsallowed += teamstats['ttls'][1].to_i
+									elsif !team['tm']['hm']
+										team1ydsallowed += teamstats['ttls'][1].to_i
+									end
 									teamstats['athlts'].each do |player|
 										stat = {}
 										stat[:week] = week
@@ -609,6 +634,11 @@ module ESPN
 		  							end
 									end
 								elsif teamstats['type'] == "receiving"
+									if team['tm']['hm']
+										team0ydsallowed += teamstats['ttls'][1].to_i
+									elsif !team['tm']['hm']
+										team1ydsallowed += teamstats['ttls'][1].to_i
+									end
 									teamstats['athlts'].each do |player|
 										stat = {}
 										stat[:week] = week
@@ -638,6 +668,11 @@ module ESPN
 		  							end
 									end
 								elsif teamstats['type'] == "fumbles"
+									if team['tm']['hm']
+										team0FumRec += teamstats['ttls'][1].to_i
+									elsif !team['tm']['hm']
+										team1FumRec += teamstats['ttls'][1].to_i
+									end
 									teamstats['athlts'].each do |player|
 										stat = {}
 										stat[:week] = week
@@ -650,6 +685,13 @@ module ESPN
 		  							end
 									end
 								elsif teamstats['type'] == "defensive"
+									if team['tm']['hm']
+										team1Sacks += teamstats['ttls'][2].to_i
+										team1DefensiveTDs += teamstats['ttls'][6].to_i
+									elsif !team['tm']['hm']
+										team0sacks += teamstats['ttls'][2].to_i
+										team0DefensiveTDs += teamstats['ttls'][6].to_i
+									end
 									teamstats['athlts'].each do |player|
 										stat = {}
 										stat[:week] = week
@@ -660,6 +702,29 @@ module ESPN
 										if stat != {} && (stat.has_key?(:miscTDs))
 											stats << stat
 		  							end
+									end
+								elsif teamstats['type'] == "interceptions"
+									# Interceptions stat order: ["interceptions", "interceptionYards", "interceptionTouchdowns"]
+									if team['tm']['hm']
+										team1Ints += teamstats['ttls'][0].to_i
+										team1IntYards += teamstats['ttls'][1].to_i
+									elsif !team['tm']['hm']
+										team0Ints += teamstats['ttls'][0].to_i
+										team1IntYards += teamstats['ttls'][1].to_i
+									end
+								elsif teamstats['type'] == "kickReturns"
+									# Kick returns stat order: ["kickReturns", "kickReturnYards", "yardsPerKickReturn", "longKickReturn", "kickReturnTouchdowns"]
+									if team['tm']['hm']
+										team1KickRet += teamstats['ttls'][1].to_i
+									elsif !team['tm']['hm']
+										team0KickRet += teamstats['ttls'][1].to_i
+									end
+								elsif teamstats['type'] == "puntReturns"
+									# Kick returns stat order: ["puntReturns", "puntReturnYards", "yardsPerPuntReturn", "longPuntReturn", "puntReturnTouchdowns"]
+									if team['tm']['hm']
+										team1PuntRet += teamstats['ttls'][1].to_i
+									elsif !team['tm']['hm']
+										team0PuntRet += teamstats['ttls'][1].to_i
 									end
 								end
 							end
@@ -840,19 +905,18 @@ module ESPN
 				stats << stat
 		  end
 		end
-		
-		team0Defense = {:week => week, :teamID => awayTeamId, :teamName => teamNames[0], :pointsAllowed => finalScores[1], :yardsAllowed => team0YdsAllowed.to_s, :fumblesRecovered => team0FumRec.to_s, :sacks => team0Sacks.to_s, :TDs => team0DefensiveTDs.to_s, :interceptions => team0Ints.to_s, :interceptionYards => team0IntYards.to_s, :kickReturnYards => team0KickRet.to_s, :puntReturnYards => team0PuntRet.to_s}
-		team1Defense = {:week => week, :teamID => homeTeamId, :teamName => teamNames[1], :pointsAllowed => finalScores[0], :yardsAllowed => team1YdsAllowed.to_s, :fumblesRecovered => team1FumRec.to_s, :sacks => team1Sacks.to_s, :TDs => team1DefensiveTDs.to_s, :interceptions => team1Ints.to_s, :interceptionYards => team1IntYards.to_s, :kickReturnYards => team1KickRet.to_s, :puntReturnYards => team1PuntRet.to_s}
+=end		
+		awayDefense = {:week => week, :teamID => awayTeamId, :teamName => teamNames[0], :pointsAllowed => finalScores[1], :yardsAllowed => team0YdsAllowed.to_s, :fumblesRecovered => team0FumRec.to_s, :sacks => team0Sacks.to_s, :TDs => team0DefensiveTDs.to_s, :interceptions => team0Ints.to_s, :interceptionYards => team0IntYards.to_s, :kickReturnYards => team0KickRet.to_s, :puntReturnYards => team0PuntRet.to_s}
+		homeDefense = {:week => week, :teamID => homeTeamId, :teamName => teamNames[1], :pointsAllowed => finalScores[0], :yardsAllowed => team1YdsAllowed.to_s, :fumblesRecovered => team1FumRec.to_s, :sacks => team1Sacks.to_s, :TDs => team1DefensiveTDs.to_s, :interceptions => team1Ints.to_s, :interceptionYards => team1IntYards.to_s, :kickReturnYards => team1KickRet.to_s, :puntReturnYards => team1PuntRet.to_s}
 
-		stats << team0Defense
-		stats << team1Defense
+		stats << awayDefense
+		stats << homeDefense
 		#defense.push(team0Defense)
 		#defense.push(team1Defense)
 		#puts teamNames
 		#puts defense
 		
 		#REAL CODE
-=end
 		}
 		stats
 	end
@@ -864,6 +928,7 @@ module ESPN
 			homeTeamId = ""
 			stat = {}
 			
+=begin old team IDs
 			awayTeamIdRegex = /espn\.gamepackage\.awayTeamId = (\".*?\");/
 			doc.xpath("//script").each do |script_section|
 				if script_section.content =~ awayTeamIdRegex
@@ -879,12 +944,15 @@ module ESPN
 			
 			#puts awayTeamId
 			#puts homeTeamId
-			
-			espn_regex = /espn\.gamepackage\.probability\.data = (\[.*?\]);/
+=end
+			#espn_regex = /espn\.gamepackage\.probability\.data = (\[.*?\]);/
+			espn_regex = /window\['__espnfitt__'\]=(\{.*?\});/
 			doc.xpath("//script").each do |script_section|
 				#puts script_section
 				if script_section.content =~ espn_regex
 					espn_data = JSON.parse(espn_regex.match(script_section.content)[1])
+					awayTeamId = espn_data['page']['content']['gamepackage']['shtChrt']['tms']['away']['id']
+					homeTeamId = espn_data['page']['content']['gamepackage']['shtChrt']['tms']['home']['id']
 					#puts espn_data.size
 					#plays = espn_data[1]['play']
 					
@@ -901,50 +969,58 @@ module ESPN
 						longTouchdowns = {}
 						longTouchdownsDefense = {}
 						fieldGoals = {}
-						espn_data.each do |group|
-							group.each do |play|
-								if play[0].to_s.eql?("play")
+						espn_data['page']['content']['gamepackage']['scrSumm']['scrPlayGrps'].each do |group|
+						#espn_data.each do |group|
+							group.each do |playStats|
+								#if play[0].to_s.eql?("play")
 									#puts play
 									#stat = {}
-									playStats = play[1]
+									#playStats = play[1]
 									#puts playStats
-									unless playStats['type'].nil?
-										if playStats['type']['id'].to_s.eql?("59")  #59 = FG Good
+									#unless playStats['type'].nil?
+										#if playStats['type']['id'].to_s.eql?("59")  #59 = FG Good
+										if playStats['typeAbbreviation'] == "FG"
 											fieldGoalString = playStats['text']
 											#puts fieldGoalString
 											fieldGoalHash = {}
 											fieldGoalArray = []
-											fieldGoalTeamId = playStats['start']['team']['id']
+											#fieldGoalTeamId = playStats['start']['team']['id']
+											fieldGoalTeamId = playStats['teamId']
 											fieldGoalHash[:link] = "teams/roster?teamId=#{fieldGoalTeamId}"
 											fieldGoalArray.push(fieldGoalHash)
 											fieldGoalTeamRoster = get_Roster(fieldGoalArray)
 											fieldGoalTeamRoster.each do |player|
 												unless player[:playerName].nil?
-													playerAbbrNoWhitespace = (player[:playerName].to_s)[0] + "." + player[:playerName].to_s.split[1..-1].join(' ')
-													if fieldGoalString.delete(' ').include?(player[:playerName].to_s.delete(' ')) || fieldGoalString.delete(' ').include?(playerAbbrNoWhitespace)
+													#playerAbbrNoWhitespace = (player[:playerName].to_s)[0] + "." + player[:playerName].to_s.split[1..-1].join(' ')
+													#if fieldGoalString.delete(' ').include?(player[:playerName].to_s.delete(' ')) || fieldGoalString.delete(' ').include?(playerAbbrNoWhitespace)
+													if fieldGoalString.include?(player[:playerName].to_s)
 														if !fieldGoals.has_key?(player[:playerID].to_sym)  # If the player doesn't exist
 															fieldGoals[player[:playerID].to_sym] = {}  # Create the key and Instantiate bonus categories
 														end
 														
-														if playStats['start']['yardsToEndzone'].to_i+17 <= 34  # These bonus categories must match in MySQL table
+														#if playStats['start']['yardsToEndzone'].to_i+17 <= 34  
+														if fieldGoalString[/(\w+)(?=\s*( Yd| Yard| yd| yard))/].to_i <= 34  # These bonus categories must match in MySQL table
 															if !fieldGoals[player[:playerID].to_sym].has_key?(:shortFGsMade)  # If the bonus category doesn't exist, insert a score of 1
 																fieldGoals[player[:playerID].to_sym][:shortFGsMade] = 1
 															else
 																fieldGoals[player[:playerID].to_sym][:shortFGsMade] += 1
 															end
-														elsif playStats['start']['yardsToEndzone'].to_i+17 <= 49
+														#elsif playStats['start']['yardsToEndzone'].to_i+17 <= 49
+														elsif fieldGoalString[/(\w+)(?=\s*( Yd| Yard| yd| yard))/].to_i <= 49
 															if !fieldGoals[player[:playerID].to_sym].has_key?(:medFGsMade)
 																fieldGoals[player[:playerID].to_sym][:medFGsMade] = 1
 															else
 																fieldGoals[player[:playerID].to_sym][:medFGsMade] += 1
 															end
-														elsif playStats['start']['yardsToEndzone'].to_i+17 <= 59
+														#elsif playStats['start']['yardsToEndzone'].to_i+17 <= 59
+														elsif fieldGoalString[/(\w+)(?=\s*( Yd| Yard| yd| yard))/].to_i <= 59
 															if !fieldGoals[player[:playerID].to_sym].has_key?(:longFGsMade)
 																fieldGoals[player[:playerID].to_sym][:longFGsMade] = 1
 															else
 																fieldGoals[player[:playerID].to_sym][:longFGsMade] += 1
 															end
-														elsif playStats['start']['yardsToEndzone'].to_i+17 >= 60
+														#elsif playStats['start']['yardsToEndzone'].to_i+17 >= 60
+														elsif fieldGoalString[/(\w+)(?=\s*( Yd| Yard| yd| yard))/].to_i >= 60
 															if !fieldGoals[player[:playerID].to_sym].has_key?(:extraLongFGsMade)
 																fieldGoals[player[:playerID].to_sym][:extraLongFGsMade] = 1
 															else
@@ -1140,10 +1216,8 @@ module ESPN
 												home2ptReturnPAT += 1 #flipped because the other team gets the points
 											end
 										end
-									end
-								end   # unless playStats.nil?
-							
-
+									#end  # unless playStats.nil?
+								#end   
 							end 
 						end
 						

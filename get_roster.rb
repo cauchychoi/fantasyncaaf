@@ -27,6 +27,7 @@ puts "Connection successful"
 client.query("truncate collegeteamroster")
 
 roster.each do |player|
+	puts player
 	teamName = player[:teamName]
 	playerName = player[:playerName]
 	position = player[:position]
