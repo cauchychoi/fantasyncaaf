@@ -169,8 +169,10 @@ weeklyStats = ESPN.get_pac12_game(2023, ARGV[0], Array(ARGV[1]))  # REAL THING
 #weeklyStats = ESPN.get_mw_game(2018, ARGV[0], Array(ARGV[1]))  # 8/25 test
 #weeklyStats = ESPN.get_pac12_games(2017, i)  # TODO: parameters should be year, week, gameID
 fantasyPoints = calculateScores(weeklyStats, client)
-#puts weeklyStats
-#puts fantasyPoints
+puts "-------------------------"
+puts weeklyStats
+puts "======================="
+puts fantasyPoints
 
 weeklyStats.each do |statRow|
 	week = statRow[:week]
@@ -266,10 +268,10 @@ weeklyStats.each do |statRow|
 	#puts queryString
 
 	if (!week.to_s.eql?("") && !playerID.to_s.eql?("") && tableName.eql?("offenseStats"))
-		#puts queryString
+		puts "!!!!!!!!!!!!!"+queryString
 		client.query(queryString)
 	elsif (!week.to_s.eql?("") && !teamID.to_s.eql?("") && tableName.eql?("defenseStats"))
-		#puts queryString
+		puts "!!!!!!!!!!!!!"+queryString
 		client.query(queryString)
 	end
 end
@@ -299,7 +301,6 @@ end
 offenseQuery += " ON DUPLICATE KEY UPDATE week=VALUES(week), playerID=VALUES(playerID), fantasyPoints=VALUES(fantasyPoints)"
 defenseQuery += " ON DUPLICATE KEY UPDATE week=VALUES(week), teamID=VALUES(teamID), fantasyPoints=VALUES(fantasyPoints)"
 
-#puts offenseQuery
 client.query(offenseQuery)
 client.query(defenseQuery)
 

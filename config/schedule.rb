@@ -31,6 +31,6 @@ end
 # 	rake 'scheduler:update_gametimes'
 # end
 
-every 1.day, at: '5:00 am' do
-	rake 'update_collegeteamroster'
-end
+# every 1.day, at: '5:00 am' do
+#	 rake 'update_collegeteamroster'
+# end

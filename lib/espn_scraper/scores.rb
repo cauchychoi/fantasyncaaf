@@ -73,11 +73,11 @@ module ESPN
 
   class << self
 
-	def get_All_Rosters()
-		teamIDs = Scores.get_teamIDs()
-		roster = Scores.get_Roster(teamIDs)
-		roster
-	end
+		def get_All_Rosters()
+			teamIDs = Scores.get_teamIDs()
+			roster = Scores.get_Roster(teamIDs)
+			roster
+		end
   
     def get_nfl_scores(year, week)
       markup = Scores.markup_from_year_and_week('nfl', year, week)
@@ -185,7 +185,7 @@ module ESPN
         end
       end
 	  
-	  def markup_from_year_week_conf(league, year, week, group)
+	  	def markup_from_year_week_conf(league, year, week, group)
         if group
           ESPN.get 'scores', league, "scoreboard/_/group/#{group}/year/#{year}/seasontype/2/week/#{week}"
         else
@@ -279,65 +279,62 @@ module ESPN
         scores
       end
 
-	  def get_teamIDs()
-		teamIDs = []
-
-		teamNames = []
-		count = 0
-		doc = ESPN.get 'scores', 'college-football', "teams"
-		#doc.xpath("//li/h5").each do |team|
-		espn_regex = /window\['__espnfitt__'\]=(\{.*?\});/
-		doc.xpath("//script").each do |script_section|
-			
-			#puts team.content
-			if script_section.content =~ espn_regex
-				espn_data = JSON.parse(espn_regex.match(script_section.content)[1])
-				#espn_data['page']
-				espn_data['page']['content']['leagueTeams']['columns'].each do |column|
-					column['groups'].each do |conference|
-						conference['tms'].each do |team|
-							teamID = {}
-							teamID[:teamID] = team['id']
-							team['lk'].each do |metaData|
-								if metaData['t'] == "roster"
-									teamLink = metaData['u']
-									teamLink = teamLink[18..-1] # get rid of /college-football/
-									#puts teamLink
-									teamID[:link] = teamLink
-									teamIDs << teamID
+	  	def get_teamIDs()
+				teamIDs = []
+				teamNames = []
+				count = 0
+				doc = ESPN.get 'scores', 'college-football', "teams"
+				#doc.xpath("//li/h5").each do |team|
+				espn_regex = /window\['__espnfitt__'\]=(\{.*?\});/
+				doc.xpath("//script").each do |script_section|	
+						if script_section.content =~ espn_regex
+							espn_data = JSON.parse(espn_regex.match(script_section.content)[1])
+							#espn_data['page']
+							espn_data['page']['content']['leagueTeams']['columns'].each do |column|
+								column['groups'].each do |conference|
+									conference['tms'].each do |team|
+										teamID = {}
+										teamID[:teamID] = team['id']
+										team['lk'].each do |metaData|
+											if metaData['t'] == "roster"
+												teamLink = metaData['u']
+												teamLink = teamLink[18..-1] # get rid of /college-football/
+												#puts teamLink
+												teamID[:link] = teamLink
+												teamIDs << teamID
+											end
+										end
+									end
 								end
 							end
+							#puts JSON.pretty_generate(espn_data)
+							#if espn_data['l'] == "Roster"
 						end
+						#teamID[:teamName] = team.content
+						#team.next.children.each do |info|
+						#	if (info.content == "Roster")
+						#		teamLink = info['href']
+						#		teamLink = teamLink[5..-1] # get rid of /ncf/
+						#		teamID[:link] = teamLink
+						#		#puts teamLink
+						#		#teamIDs << teamLink
+						#		teamIDs << teamID
+						#	end
+						#end
+						
 					end
-				end
-				#puts JSON.pretty_generate(espn_data)
-				#if espn_data['l'] == "Roster"
-			end
-			#teamID[:teamName] = team.content
-			#team.next.children.each do |info|
-			#	if (info.content == "Roster")
-			#		teamLink = info['href']
-			#		teamLink = teamLink[5..-1] # get rid of /ncf/
-			#		teamID[:link] = teamLink
-			#		#puts teamLink
-			#		#teamIDs << teamLink
-			#		teamIDs << teamID
-			#	end
-			#end
-			
-		end
-		#puts teamIDs
-		#doc.xpath("//li/span").each do |team|
-		#	team.children.each do |info|
-		#		if (info.content == "Roster")
-		#			teamLink = info['href']
-		#			teamLink = teamLink[5..-1] # get rid of /ncf/
-		#			teamIDs << teamLink
-		#		end
-		#	end
-		#end
-		teamIDs
-	  end
+					#puts teamIDs
+					#doc.xpath("//li/span").each do |team|
+					#	team.children.each do |info|
+					#		if (info.content == "Roster")
+					#			teamLink = info['href']
+					#			teamLink = teamLink[5..-1] # get rid of /ncf/
+					#			teamIDs << teamLink
+					#		end
+					#	end
+					#end
+					teamIDs
+				 end
 	  
 	  def get_gameIDs(doc)
         #scores = []
@@ -523,57 +520,153 @@ module ESPN
 	  end
 	  
 	  def get_stats_boxscore(pages, week)
-		#ESPN.get 'scores', league, "scoreboard/_/group/#{group}/year/#{year}/seasontype/2/week/#{week}"
-		stats = []
+			#ESPN.get 'scores', league, "scoreboard/_/group/#{group}/year/#{year}/seasontype/2/week/#{week}"
+			stats = []
 		
-		#REAL CODE
-		pages.each { |page|
-		html = ESPN.get 'scores', 'college-football', "boxscore?gameId=#{page}"
-		
-		#Get Team IDs
-		awayTeamId = ""
-		homeTeamId = ""
+			#REAL CODE
+			pages.each { |page|
+				html = ESPN.get 'scores', 'college-football', "boxscore?gameId=#{page}"
 			
-		awayTeamIdRegex = /espn\.gamepackage\.awayTeamId = (\".*?\");/
-		html.xpath("//script").each do |script_section|
-			if script_section.content =~ awayTeamIdRegex
-				awayTeamId = JSON.parse(awayTeamIdRegex.match(script_section.content)[1])
-			end
-		end
-		homeTeamIdRegex = /espn\.gamepackage\.homeTeamId = (\".*?\");/
-		html.xpath("//script").each do |script_section|
-			if script_section.content =~ homeTeamIdRegex
-				homeTeamId = JSON.parse(homeTeamIdRegex.match(script_section.content)[1])
-			end
-		end
-		
-		# Variables for defense. team0 = away, team1 = home
-		teamCount = 0
-		teamNames = []
-		finalScores = []
-		finalScoreCount = 0
-		defense = []
-		team0Sacks = 0
-		team1Sacks = 0
-		team0DefensiveTDs = 0
-		team1DefensiveTDs = 0
-		team0Ints = 0
-		team1Ints = 0
-		team0IntYards = 0
-		team1IntYards = 0
-		team0KickRet = 0
-		team1KickRet = 0
-		team0PuntRet = 0
-		team1PuntRet = 0
-		team0FumRec = 0
-		team1FumRec = 0
-		team0YdsAllowed = 0
-		team1YdsAllowed = 0
-		
-		#DEBUG
-		#html = ESPN.get 'scores', 'college-football', "boxscore?gameId=#{pages[0]}"
-		#html = ESPN.get 'scores', 'college-football', "boxscore?gameId=400935316"
-		
+				#Get Team IDs
+				awayTeamId = ""
+				homeTeamId = ""
+				
+				awayTeamIdRegex = /espn\.gamepackage\.awayTeamId = (\".*?\");/
+				html.xpath("//script").each do |script_section|
+					if script_section.content =~ awayTeamIdRegex
+						awayTeamId = JSON.parse(awayTeamIdRegex.match(script_section.content)[1])
+					end
+				end
+				homeTeamIdRegex = /espn\.gamepackage\.homeTeamId = (\".*?\");/
+				html.xpath("//script").each do |script_section|
+					if script_section.content =~ homeTeamIdRegex
+						homeTeamId = JSON.parse(homeTeamIdRegex.match(script_section.content)[1])
+					end
+				end
+			
+				# Variables for defense. team0 = away, team1 = home
+				teamCount = 0
+				teamNames = []
+				finalScores = []
+				finalScoreCount = 0
+				defense = []
+				team0Sacks = 0
+				team1Sacks = 0
+				team0DefensiveTDs = 0
+				team1DefensiveTDs = 0
+				team0Ints = 0
+				team1Ints = 0
+				team0IntYards = 0
+				team1IntYards = 0
+				team0KickRet = 0
+				team1KickRet = 0
+				team0PuntRet = 0
+				team1PuntRet = 0
+				team0FumRec = 0
+				team1FumRec = 0
+				team0YdsAllowed = 0
+				team1YdsAllowed = 0
+			
+				#DEBUG
+				#html = ESPN.get 'scores', 'college-football', "boxscore?gameId=#{pages[0]}"
+				#html = ESPN.get 'scores', 'college-football', "boxscore?gameId=400935316"
+			
+				espn_regex = /window\['__espnfitt__'\]=(\{.*?\});/
+				html.xpath("//script").each do |script_section|
+					if script_section.content =~ espn_regex
+						espn_data = JSON.parse(espn_regex.match(script_section.content)[1])
+						#espn_data['page']['content']['cmpttn']
+						espn_data['page']['content']['gamepackage']['bxscr'].each do |team|
+							team['stats'].each do |teamstats|
+								if teamstats['type'] == "passing"
+									teamstats['athlts'].each do |player|
+										stat = {}
+										stat[:week] = week
+										stat[:playerName] = player['athlt']['dspNm']
+										stat[:playerID] = player['athlt']['id']
+										# Passing stat order: ["completions/passingAttempts", "passingYards", "yardsPerPassAttempt", "passingTouchdowns", "interceptions", "adjQBR"]
+										stat[:completedPasses] = player['stats'][0].partition('/').first
+										stat[:passAttempts] = player['stats'][0].partition('/').last
+										stat[:passingYards] = player['stats'][1]
+										stat[:passingTDs] = player['stats'][3]
+										stat[:passingInterceptions] = player['stats'][4]
+										if stat != {} && (stat.has_key?(:completedPasses))
+											stats << stat
+		  							end
+									end
+								elsif teamstats['type'] == "rushing"
+									teamstats['athlts'].each do |player|
+										stat = {}
+										stat[:week] = week
+										stat[:playerName] = player['athlt']['dspNm']
+										stat[:playerID] = player['athlt']['id']
+										# Rushing stat order: ["rushingAttempts", "rushingYards", "yardsPerRushAttempt", "rushingTouchdowns", "longRushing"]
+										stat[:rushingAttempts] = player['stats'][0]
+										stat[:rushingYards] = player['stats'][1]
+										stat[:rushingTDs] = player['stats'][3]
+										if stat != {} && (stat.has_key?(:rushingAttempts))
+											stats << stat
+		  							end
+									end
+								elsif teamstats['type'] == "receiving"
+									teamstats['athlts'].each do |player|
+										stat = {}
+										stat[:week] = week
+										stat[:playerName] = player['athlt']['dspNm']
+										stat[:playerID] = player['athlt']['id']
+										# Receiving stat order: ["receptions", "receivingYards", "yardsPerReception", "receivingTouchdowns", "longReception"]
+										stat[:receptions] = player['stats'][0]
+										stat[:receivingYards] = player['stats'][1]
+										stat[:receivingTDs] = player['stats'][3]
+										if stat != {} && (stat.has_key?(:receptions))
+											stats << stat
+		  							end
+									end
+								elsif teamstats['type'] == "kicking"
+									teamstats['athlts'].each do |player|
+										stat = {}
+										stat[:week] = week
+										stat[:playerName] = player['athlt']['dspNm']
+										stat[:playerID] = player['athlt']['id']
+										# Kicking stat order: ["punts", "puntYards", "grossAvgPuntYards", "touchbacks", "puntsInside20", "longPunt"]
+										stat[:fieldGoalAttempts] = player['stats'][0].partition('/').last
+										stat[:fieldGoalsMade] = player['stats'][0].partition('/').first
+										stat[:extraPointAttempts] = player['stats'][3].partition('/').last
+										stat[:extraPoints] = player['stats'][3].partition('/').first
+										if stat != {} && (stat.has_key?(:fieldGoalAttempts))
+											stats << stat
+		  							end
+									end
+								elsif teamstats['type'] == "fumbles"
+									teamstats['athlts'].each do |player|
+										stat = {}
+										stat[:week] = week
+										stat[:playerName] = player['athlt']['dspNm']
+										stat[:playerID] = player['athlt']['id']
+										# Fumbles stat order: ["fumbles", "fumblesLost", "fumblesRecovered"]
+										stat[:fumblesLost] = player['stats'][1]
+										if stat != {} && (stat.has_key?(:fumblesLost))
+											stats << stat
+		  							end
+									end
+								elsif teamstats['type'] == "defensive"
+									teamstats['athlts'].each do |player|
+										stat = {}
+										stat[:week] = week
+										stat[:playerName] = player['athlt']['dspNm']
+										stat[:playerID] = player['athlt']['id']
+										# Defensive stat order: ["totalTackles", "soloTackles", "sacks", "tacklesForLoss", "passesDefended", "hurries", "defensiveTouchdowns"]
+										stat[:miscTDs] = player['stats'][6]
+										if stat != {} && (stat.has_key?(:miscTDs))
+											stats << stat
+		  							end
+									end
+								end
+							end
+						end
+					end
+				end
+=begin old code for parsing html
 		html.xpath("//tbody/tr").each do |player|
 			stat = {}
 			if player['class'] != "highlight"
@@ -607,8 +700,7 @@ module ESPN
 
 					#end
 					
-						player.children.each do |playerStat|
-					
+					player.children.each do |playerStat|
 						#Defense team name and final score
 						#if playerStat['class'] == "team-name"
 						#teamNames[teamCount] = playerStat.content
@@ -745,7 +837,7 @@ module ESPN
 		  
 		  
 		  if stat != {} && (stat.has_key?(:completedPasses) || stat.has_key?(:rushingAttempts) || stat.has_key?(:receptions) || stat.has_key?(:fieldGoalAttempts) || stat.has_key?(:fumblesLost) || stat.has_key?(:twoPointConversions) || stat.has_key?(:miscTDs))
-			stats << stat
+				stats << stat
 		  end
 		end
 		
@@ -760,9 +852,10 @@ module ESPN
 		#puts defense
 		
 		#REAL CODE
+=end
 		}
 		stats
-	  end
+	end
 	  
 	  def get_stats_summary(pages, week, stats)
 		pages.each { |page|
