@@ -268,7 +268,7 @@ module ESPN
               if competitor['homeAway'] == 'home'
                 score[:home_team] = competitor['team']['id'].downcase
                 score[:home_score] = competitor['score'].to_i
-                else
+              else
                 score[:away_team] = competitor['team']['id'].downcase
                 score[:away_score] = competitor['score'].to_i
               end
@@ -526,12 +526,10 @@ module ESPN
 			#REAL CODE
 			pages.each { |page|
 				html = ESPN.get 'scores', 'college-football', "boxscore?gameId=#{page}"
-
-=begin old getTeamIDs			
-				#Get Team IDs
 				awayTeamId = ""
 				homeTeamId = ""
 				
+=begin old getTeamIDs					
 				awayTeamIdRegex = /espn\.gamepackage\.awayTeamId = (\".*?\");/
 				html.xpath("//script").each do |script_section|
 					if script_section.content =~ awayTeamIdRegex
