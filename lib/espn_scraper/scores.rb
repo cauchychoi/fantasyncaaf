@@ -580,10 +580,10 @@ module ESPN
 						espn_data['page']['content']['gamepackage']['gmStrp']['tms'].each do |teamInfo|
 							if teamInfo['isHome']
 								homeTeamId = teamInfo['id']
-								finalScores[0] = teamInfo['score']
+								finalScores[1] = teamInfo['score']
 							elsif !teamInfo['isHome']
 								awayTeamId = teamInfo['id']
-								finalScores[1] = teamInfo['score']
+								finalScores[0] = teamInfo['score']
 							end
 						end
 
