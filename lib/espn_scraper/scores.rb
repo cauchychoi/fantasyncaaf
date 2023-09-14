@@ -697,9 +697,7 @@ module ESPN
 											stat[:playerName] = player['athlt']['dspNm']
 											stat[:playerID] = player['athlt']['id']
 											# Defensive stat order: ["totalTackles", "soloTackles", "sacks", "tacklesForLoss", "passesDefended", "hurries", "defensiveTouchdowns"]
-											if player['stats'][6].to_i != 0
-												stat[:miscTDs] = player['stats'][6]
-											end
+											stat[:miscTDs] = player['stats'][6]
 											if stat != {} && (stat.has_key?(:miscTDs))
 												stats << stat
 			  							end
