@@ -712,7 +712,7 @@ module ESPN
 										team1IntYards += teamstats['ttls'][1].to_i
 									elsif !team['tm']['hm']
 										team0Ints += teamstats['ttls'][0].to_i
-										team1IntYards += teamstats['ttls'][1].to_i
+										team0IntYards += teamstats['ttls'][1].to_i
 									end
 								elsif teamstats['type'] == "kickReturns"
 									# Kick returns stat order: ["kickReturns", "kickReturnYards", "yardsPerKickReturn", "longKickReturn", "kickReturnTouchdowns"]
