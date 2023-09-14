@@ -667,9 +667,9 @@ module ESPN
 									end
 								elsif teamstats['type'] == "fumbles"
 									if team['tm']['hm']
-										team0FumRec += teamstats['ttls'][1].to_i
+										team1FumRec += teamstats['ttls'][2].to_i
 									elsif !team['tm']['hm']
-										team1FumRec += teamstats['ttls'][1].to_i
+										team0FumRec += teamstats['ttls'][2].to_i
 									end
 									teamstats['athlts'].each do |player|
 										stat = {}
