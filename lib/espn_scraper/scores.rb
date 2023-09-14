@@ -1010,7 +1010,7 @@ module ESPN
 											fieldGoalArray = []
 											#fieldGoalTeamId = playStats['start']['team']['id']
 											fieldGoalTeamId = playStats['teamId']
-											fieldGoalHash[:link] = "teams/roster?teamId=#{fieldGoalTeamId}"
+											fieldGoalHash[:link] = "team/roster/_/id/#{fieldGoalTeamId}"
 											fieldGoalArray.push(fieldGoalHash)
 											fieldGoalTeamRoster = get_Roster(fieldGoalArray)
 											fieldGoalTeamRoster.each do |player|
@@ -1120,7 +1120,7 @@ module ESPN
 													#		touchdownTeamId = homeTeamId
 													#	end
 													#end
-														touchdownTeamHash[:link] = "teams/roster?teamId=#{touchdownTeamId}"
+														touchdownTeamHash[:link] = "team/roster/_/id/#{touchdownTeamId}"
 														touchdownTeamArray.push(touchdownTeamHash)
 														touchdownTeamRoster = get_Roster(touchdownTeamArray)
 														touchdownTeamRoster.each do |player|
@@ -1210,7 +1210,7 @@ module ESPN
 												conversionTeamArray = []
 												#conversionTeamId = playStats['start']['team']['id']
 												conversionTeamId = playStats['teamId']
-												conversionTeamHash[:link] = "teams/roster?teamId=#{conversionTeamId}"
+												conversionTeamHash[:link] = "team/roster/_/id/#{conversionTeamId}"
 												conversionTeamArray.push(conversionTeamHash)
 												conversionRoster = get_Roster(conversionTeamArray)
 												#puts "patString: " + patString.delete(' ')
