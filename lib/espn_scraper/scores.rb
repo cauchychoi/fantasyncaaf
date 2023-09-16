@@ -953,10 +953,13 @@ module ESPN
 				#puts script_section
 				if script_section.content =~ espn_regex
 					espn_data = JSON.parse(espn_regex.match(script_section.content)[1])
-					awayTeamId = espn_data['page']['content']['gamepackage']['shtChrt']['tms']['away']['id']
-					awayTeamDisplayName = espn_data['page']['content']['gamepackage']['shtChrt']['tms']['away']['displayName']
-					homeTeamId = espn_data['page']['content']['gamepackage']['shtChrt']['tms']['home']['id']
-					homeTeamDisplayName = espn_data['page']['content']['gamepackage']['shtChrt']['tms']['home']['displayName']
+					espn_data['page']['content']['gamepackage']['gmStrp']['tms'].each do |team|
+						if team['isHome']
+							homeTeamId = team['id']
+						elsif !team['isHome']
+							awayTeamId = team['id']
+						end
+					end
 					#puts espn_data.size
 					#plays = espn_data[1]['play']
 					
