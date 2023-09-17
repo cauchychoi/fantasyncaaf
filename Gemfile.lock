@@ -1,6 +1,6 @@
 GIT
   remote: https://github.com/cauchychoi/fantasyncaaf.git
-  revision: 7d54e0472863ff07dafee8918f35e8c2426d83aa
+  revision: d0e8b7715fa98a77768aba205aca50971bdcfb93
   specs:
     espn_scraper (1.5.4)
       httparty

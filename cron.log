@@ -7351,3 +7351,31 @@ Connection successful
 /Users/cauchy/.rbenv/versions/2.7.0/lib/ruby/gems/2.7.0/gems/dbi-0.4.5/lib/dbi/handles/statement.rb:324: warning: assigned but unused variable - cols
 /Users/cauchy/.rbenv/versions/2.7.0/lib/ruby/gems/2.7.0/gems/dbi-0.4.5/lib/dbi/handles/statement.rb:358: warning: parentheses after method name is interpreted as an argument list, not a decomposed argument
 /Users/cauchy/.rbenv/versions/2.7.0/lib/ruby/gems/2.7.0/gems/dbi-0.4.5/lib/dbi/handles/statement.rb:364: warning: parentheses after method name is interpreted as an argument list, not a decomposed argument
+true
+Connection successful
+Updating scores from ESPN...
+/Users/cauchy/.rbenv/versions/2.7.0/lib/ruby/2.7.0/bundler/lockfile_parser.rb:70:in `initialize': Your Gemfile.lock contains merge conflicts. (Bundler::LockfileError)
+Run `git checkout HEAD -- Gemfile.lock` first to get a clean lock.
+	from /Users/cauchy/.rbenv/versions/2.7.0/lib/ruby/2.7.0/bundler/definition.rb:83:in `new'
+	from /Users/cauchy/.rbenv/versions/2.7.0/lib/ruby/2.7.0/bundler/definition.rb:83:in `initialize'
+	from /Users/cauchy/.rbenv/versions/2.7.0/lib/ruby/2.7.0/bundler/dsl.rb:234:in `new'
+	from /Users/cauchy/.rbenv/versions/2.7.0/lib/ruby/2.7.0/bundler/dsl.rb:234:in `to_definition'
+	from /Users/cauchy/.rbenv/versions/2.7.0/lib/ruby/2.7.0/bundler/dsl.rb:13:in `evaluate'
+	from /Users/cauchy/.rbenv/versions/2.7.0/lib/ruby/2.7.0/bundler/definition.rb:34:in `build'
+	from /Users/cauchy/.rbenv/versions/2.7.0/lib/ruby/2.7.0/bundler.rb:195:in `definition'
+	from /Users/cauchy/.rbenv/versions/2.7.0/lib/ruby/2.7.0/bundler.rb:143:in `setup'
+	from /Users/cauchy/.rbenv/versions/2.7.0/lib/ruby/2.7.0/bundler/setup.rb:20:in `block in <top (required)>'
+	from /Users/cauchy/.rbenv/versions/2.7.0/lib/ruby/2.7.0/bundler/ui/shell.rb:136:in `with_level'
+	from /Users/cauchy/.rbenv/versions/2.7.0/lib/ruby/2.7.0/bundler/ui/shell.rb:88:in `silence'
+	from /Users/cauchy/.rbenv/versions/2.7.0/lib/ruby/2.7.0/bundler/setup.rb:20:in `<top (required)>'
+	from /Users/cauchy/.rbenv/versions/2.7.0/lib/ruby/2.7.0/rubygems/core_ext/kernel_require.rb:92:in `require'
+	from /Users/cauchy/.rbenv/versions/2.7.0/lib/ruby/2.7.0/rubygems/core_ext/kernel_require.rb:92:in `require'
+rake aborted!
+Command failed with status (1): [/Users/cauchy/.rbenv/versions/2.7.0/bin/ru...]
+/Users/cauchy/Documents/fantasyncaaf/lib/tasks/scheduler.rake:13:in `block (2 levels) in <top (required)>'
+/Users/cauchy/Documents/fantasyncaaf/lib/tasks/scheduler.rake:9:in `each'
+/Users/cauchy/Documents/fantasyncaaf/lib/tasks/scheduler.rake:9:in `block in <top (required)>'
+/Users/cauchy/.rbenv/versions/2.7.0/bin/bundle:23:in `load'
+/Users/cauchy/.rbenv/versions/2.7.0/bin/bundle:23:in `<main>'
+Tasks: TOP => update_scores
+(See full trace by running task with --trace)

@@ -977,17 +977,19 @@ module ESPN
 						longTouchdownsDefense = {}
 						fieldGoals = {}
 
-						espn_data['page']['content']['gamepackage']['allPlys'].each do |playGroup|
-							unless playGroup['plays'].nil?
-								playGroup['plays'].each do |play|
-									if play['description'].to_s.downcase.include?("sack")
-										tempText = play['description'].to_s.downcase
-	                  sackYards = tempText[/(\w+)(?=\s*( yd| yard))/].to_i  # Get first instance of <xx> yards or yds (?= vs ?!)
-	                  if playGroup['teamName'].to_s.eql?(homeTeamDisplayName)
-	                  	awaySackYardage += sackYards
-	                  else
-	                  	homeSackYardage += sackYards
-	                  end
+						unless espn_data['page']['content']['gamepackage']['allPlys'].nil?
+							espn_data['page']['content']['gamepackage']['allPlys'].each do |playGroup|
+								unless playGroup['plays'].nil?
+									playGroup['plays'].each do |play|
+										if play['description'].to_s.downcase.include?("sack")
+											tempText = play['description'].to_s.downcase
+		                  sackYards = tempText[/(\w+)(?=\s*( yd| yard))/].to_i  # Get first instance of <xx> yards or yds (?= vs ?!)
+		                  if playGroup['teamName'].to_s.eql?(homeTeamDisplayName)
+		                  	awaySackYardage += sackYards
+		                  else
+		                  	homeSackYardage += sackYards
+		                  end
+										end
 									end
 								end
 							end
