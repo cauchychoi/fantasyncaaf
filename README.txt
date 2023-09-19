@@ -82,10 +82,37 @@ bundle install    ## --force if needed
 Credentials in git:
 https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git
 
-brew install git
+arch -x86_64 brew install git
 brew tap microsoft/git
-brew install --cask git-credential-manager
+arch -x86_64 brew install --cask git-credential-manager
 
 To update cronjob:
 Modify config/schedule.rb
 whenever --update-crontab
+
+JSON formatting:
+Tools --> Install Package Control
+Open Terminal and navigate to ~/Library/Application Support/Sublime Text 3/Packages
+git clone https://github.com/jdavisclark/JsFormat
+Sublime Text --> Settings --> Package Settings --> JSFormat --> Key Bindings - User
+Paste the following:
+[
+  {
+    "keys": [
+      "command+l"
+    ],
+    "command": "reindent"
+  },
+  {
+    "keys": [
+      "ctrl+shift+s"
+    ],
+    "command": "auto_save"
+  }, 
+  {
+    "keys": [
+      "ctrl+alt+f"
+    ],
+    "command": "js_format"
+  }
+]
