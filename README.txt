@@ -51,18 +51,21 @@ git clone https://github.com/cauchychoi/fantasyncaaf
 arch -x86_64 /bin/bash -c "$(curl -fsSL https://raw.githubusercontent.com/Homebrew/install/HEAD/install.sh)"    // follow instructions after install to add Homebrew to PATH
 brew update
 arch -x86_64 brew install rbenv
-echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
-source ~/.bash_profile
+#echo 'eval "$(rbenv init -)"' >> ~/.bash_profile
+#source ~/.bash_profile
+echo 'eval "$(rbenv init -)"' >> ~/.zshenv
+source ~/.zshenv
 
 CFLAGS="-Wno-error=implicit-function-declaration" RUBY_CONFIGURE_OPTS='--with-readline-dir=/usr/local/opt/readline/' arch -x86_64 rbenv install 2.7.0
 export PATH="$HOME/.rbenv/bin:$PATH"
 eval "$(rbenv init -)"
 rbenv global 2.7.0
 export GEM_HOME="$HOME/.gem"
+rbenv versions   #make sure rbenv is set to ruby version installed above. Remove any vestigial .ruby-version files)
 gem install rails --no-document
 
 arch -x86_64 brew install openssl
-ln -sfn /usr/local/Cellar/openssl3/3.1.2 /usr/local/opt/openssl 
+ln -sfn /usr/local/Cellar/openssl@3/3.1.2 /usr/local/opt/openssl   #check the openssl version/path
 export LIBRARY_PATH=$LIBRARY_PATH:/usr/local/opt/openssl/lib/
 bundle config --local build.mysql2 "--with-ldflags=-L/usr/local/opt/openssl/lib --with-cppflags=-I/usr/local/opt/openssl/include"
 
@@ -70,19 +73,46 @@ arch -x86_64 brew install mysql
 arch -x86_64 brew install libpq
 echo 'export PATH="/usr/local/opt/libpq/bin:$PATH"' >> ~/.bash_profile
 brew tap homebrew/core
-gem install pg -v '1.0.0' -- --with-pg-config=/usr/local/opt/libpq/bin/pg_config
+gem install pg -v '1.5.4' -- --with-pg-config=/usr/local/opt/libpq/bin/pg_config    # and/or '1.0.0' as needed
 //brew install postgresql
 
 gem install bundler
-bundle install
+bundle install    ## --force if needed
 
 Credentials in git:
 https://docs.github.com/en/get-started/getting-started-with-git/caching-your-github-credentials-in-git
 
-brew install git
+arch -x86_64 brew install git
 brew tap microsoft/git
-brew install --cask git-credential-manager
+arch -x86_64 brew install --cask git-credential-manager
 
 To update cronjob:
 Modify config/schedule.rb
 whenever --update-crontab
+
+JSON formatting:
+Tools --> Install Package Control
+Open Terminal and navigate to ~/Library/Application Support/Sublime Text 3/Packages
+git clone https://github.com/jdavisclark/JsFormat
+Sublime Text --> Settings --> Package Settings --> JSFormat --> Key Bindings - User
+Paste the following:
+[
+  {
+    "keys": [
+      "command+l"
+    ],
+    "command": "reindent"
+  },
+  {
+    "keys": [
+      "ctrl+shift+s"
+    ],
+    "command": "auto_save"
+  }, 
+  {
+    "keys": [
+      "ctrl+alt+f"
+    ],
+    "command": "js_format"
+  }
+]
