@@ -28,7 +28,7 @@ every 1.day, at: '3:00 am' do
 end
 
  every 1.day, at: '4:00 am' do
- 	rake 'scheduler:update_gametimes'
+ 	rake 'update_gametimes'
  end
 
 # every 1.day, at: '5:00 am' do
