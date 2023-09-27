@@ -36,7 +36,7 @@ end
 
 # Get the next week's schedule (set to the Sunday before the week)
 task :update_gametimes do
-	sundayBeforeWeek1 = Time.new(2023,8,20,7,0,0,"+00:00")
+	sundayBeforeWeek1 = Time.new(2023,8,27,7,0,0,"+00:00")
 	weekInSeconds = 7*24*60*60
 
 	if (Time.now.utc > (sundayBeforeWeek1 + (15 * weekInSeconds)) && Time.now.utc < (sundayBeforeWeek1 + (16 * weekInSeconds)))
