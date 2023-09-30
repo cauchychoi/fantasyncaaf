@@ -956,8 +956,10 @@ module ESPN
 					espn_data['page']['content']['gamepackage']['gmStrp']['tms'].each do |team|
 						if team['isHome']
 							homeTeamId = team['id']
+							homeTeamDisplayName = team['displayName']
 						elsif !team['isHome']
 							awayTeamId = team['id']
+							awayTeamDisplayName = team['displayName']
 						end
 					end
 					#puts espn_data.size
@@ -984,7 +986,7 @@ module ESPN
 										if play['description'].to_s.downcase.include?("sack")
 											tempText = play['description'].to_s.downcase
 		                  sackYards = tempText[/(\w+)(?=\s*( yd| yard))/].to_i  # Get first instance of <xx> yards or yds (?= vs ?!)
-		                  if playGroup['teamName'].to_s.eql?(homeTeamDisplayName)
+		                  if playGroup['teamName'].to_s.include?(homeTeamDisplayName)
 		                  	awaySackYardage += sackYards
 		                  else
 		                  	homeSackYardage += sackYards
