@@ -984,13 +984,15 @@ module ESPN
 								unless playGroup['plays'].nil?
 									playGroup['plays'].each do |play|
 										if play['description'].to_s.downcase.include?("sack")
-											tempText = play['description'].to_s.downcase
-		                  sackYards = tempText[/(\w+)(?=\s*( yd| yard))/].to_i  # Get first instance of <xx> yards or yds (?= vs ?!)
-		                  if playGroup['teamName'].to_s.include?(homeTeamDisplayName)
-		                  	awaySackYardage += sackYards
-		                  else
-		                  	homeSackYardage += sackYards
-		                  end
+											unless play['description'].to_s.downcase.include?("no play")
+												tempText = play['description'].to_s.downcase
+			                  sackYards = tempText[/(\w+)(?=\s*( yd| yard))/].to_i  # Get first instance of <xx> yards or yds (?= vs ?!)
+			                  if playGroup['teamName'].to_s.include?(homeTeamDisplayName)
+			                  	awaySackYardage += sackYards
+			                  else
+			                  	homeSackYardage += sackYards
+			                  end
+			                end
 										end
 									end
 								end
