@@ -19,7 +19,7 @@ set :output, "~/Documents/fantasyncaaf/cron.log"
 
 # Learn more: http://github.com/javan/whenever
 
-every 5.minutes do
+every 7.minutes do
 	rake 'update_scores'
 end
 
